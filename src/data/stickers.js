@@ -13,14 +13,14 @@ export const STICKERS = [
   {
     id: 'agent-mode',
     name: 'Agent Mode',
-    file: '/stickers/toffee_agent_mode_sticker.png',
+    file: '/stickers/toffee-agent-mode-sticker.png',
     rarity: 'common',
     weight: 10,
   },
   {
     id: 'shrimp-mode',
     name: 'Shrimp Mode',
-    file: '/stickers/toffee_shrimp_mode_sticker.png',
+    file: '/stickers/toffee-shrimp-mode-sticker.png',
     rarity: 'common',
     weight: 10,
   },

@@ -3,7 +3,7 @@ import ActionButtons from './ActionButtons.jsx'
 
 // The result screen under the sticker: its name, its rarity (if it has one) and the buttons.
 // The sticker artwork itself is drawn in the 3D scene (StickerReveal).
-export default function RevealResult({ sticker, onSave, onShare, onOpenAnother }) {
+export default function RevealResult({ sticker, saveFailed, onSave, onShare, onOpenAnother }) {
   const rarity = sticker?.rarity && RARITIES[sticker.rarity]
 
   return (
@@ -14,6 +14,11 @@ export default function RevealResult({ sticker, onSave, onShare, onOpenAnother }
         {rarity && <p className="sticker-rarity">{rarity}</p>}
       </div>
       <ActionButtons onSave={onSave} onShare={onShare} onOpenAnother={onOpenAnother} />
+      {saveFailed && (
+        <p className="result-error" role="alert">
+          Couldn’t save the sticker. Please try again.
+        </p>
+      )}
     </section>
   )
 }

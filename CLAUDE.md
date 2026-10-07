@@ -716,8 +716,11 @@ Notes:
 
 - Agent sticker PNG has faint stray marks near its top corners (in the source art).
 
+- [x] Sticker PNGs renamed to `toffee-<name>-sticker.png` (hyphens) in `public/stickers/`; `src/data/stickers.js` updated.
+- [x] Phase 9 — Save: `utils/saveSticker.js` fetches the ORIGINAL PNG (via `getStickerBlob` in `utils/stickerFile.js`, which rejects 404s and HTML-pretending-to-be-PNG, and remembers the blob) and downloads it as `toffee-<name>-sticker.png` (`stickerFileName`, derived from the sticker name). Verified byte-identical to the asset; repeat taps ignored while saving; failure shows a short message. On iPhone Safari this saves to Files/Downloads (not Photos) — Photos comes via the share sheet in Phase 10.
+
 Current task:
 
-Phase 9 — Save: download the original sticker PNG (not a screenshot), filename from the sticker name (e.g. agent-mode.png).
+Phase 10 — native Share (Web Share API with the PNG file; call `getStickerBlob` early so the file is ready inside the tap; fall back gracefully to Save).
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.
