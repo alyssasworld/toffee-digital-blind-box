@@ -674,16 +674,23 @@ Phase: Web application development
 
 Completed:
 
-- [x] Blind-box schematic
-- [x] Sticker PNGs
-- [x] 3D blind-box GLB
-- [x] React/Vite project
+- [x] Blind-box schematic (kept in `reference/`, not shipped)
+- [x] Sticker PNGs (`public/stickers/`)
+- [x] 3D blind-box GLB (`public/models/toffee_box.glb`)
+- [x] Vite + React + R3F project set up
 - [x] GitHub repository
+- [x] Phase 1 — 3D box renders, centred, responsive camera, true colours (no tone mapping)
+
+GLB hierarchy: `Box_Root` > `Box_Body`, `Flap_Front`, `Flap_Left`, `Flap_Right`, `Flap_Back`.
+Each flap's origin is on its hinge, so it opens by rotating its node.
+
+Known to-dos:
+
+- `sounds/*.MP3` are 4 identical placeholder files; replace before adding sound.
+- Sticker PNGs are 3000x3000 / ~2.5 MB each; make ~1024px WebP copies for on-screen reveal, keep originals for Save/Share.
 
 Current task:
 
-Begin Phase 1 — project setup and 3D model rendering.
-
-The supplied assets are final enough to begin implementation.
+Phase 2 — responsive mobile layout (then Phase 3 tap interaction).
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.
