@@ -28,6 +28,13 @@ export const STICKERS = [
     rarity: 'common',
     weight: 10,
   },
+  {
+    id: 'model-mode',
+    name: 'Model Mode',
+    file: '/stickers/toffee-model-mode-sticker.png',
+    rarity: 'common',
+    weight: 10,
+  },
 ]
 
 // The small copy shown in the 3D reveal: /stickers/x.png -> /stickers/preview/x.webp

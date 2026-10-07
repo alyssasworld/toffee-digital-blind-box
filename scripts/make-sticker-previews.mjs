@@ -11,7 +11,16 @@
 // It only redoes files whose original is newer; add --force to redo everything.
 import fs from 'node:fs'
 import path from 'node:path'
-import sharp from 'sharp'
+
+// If the image tool can't load (for example on an unusual build machine), do NOT fail the build:
+// the committed previews are used as they are, and the app falls back to the original PNG for any missing one.
+let sharp
+try {
+  sharp = (await import('sharp')).default
+} catch (error) {
+  console.warn(`Sticker previews skipped: the image tool (sharp) could not be loaded (${error.message}).`)
+  process.exit(0)
+}
 
 const SIZE = 1280 // longest side in pixels
 const QUALITY = 88

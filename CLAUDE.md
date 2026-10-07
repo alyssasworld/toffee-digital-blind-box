@@ -744,10 +744,13 @@ Open questions for the user: (1) sound — `sounds/*.MP3` are still 4 identical 
   - Sound: `src/audio/sounds.js` (Web Audio; files in `/sounds`, imported via Vite `?url`), `hooks/useSounds.js`, `components/SoundToggle.jsx` (pixel speaker button, top right, last in tab order, choice saved in localStorage). Mapping: tap -> `user_clicks_open_pop`, flaps opening -> `opening_box`, sticker rising -> `open_package_glitter`, Open another -> `open_again`. Volumes/delays in `SOUND_MIX` (src/config.js; the clips differ a lot in loudness). The audio engine is created suspended and woken by the first tap/key (phone rule); the first sound starts ~80ms late while it wakes. Web Audio respects the iPhone silent switch (by design). Missing/failed sound files => silent, no errors. Verified timings: pop @0s, box opening @2.27s, glitter @3.87s.
   - Sticker caption text in the artwork is olive/yellow and has low contrast against the blue sky (still readable); the sticker art itself is unchanged.
 
-Open questions for the user: avoid-repeat rule (recommended: cap streaks at 2 in a row); where it will be hosted (Phase 14).
+- [x] Third sticker "Model Mode" (`toffee-model-mode-sticker.png`, renamed from `im_a_model_mode.png` to follow the `toffee-*-sticker.png` convention; weight 10, common; preview generated). All three equal weight => each 33.3%, same sticker twice in a row 33.3% (was 50%). Decision: NO avoid-repeat rule (repeats are part of the blind-box magic).
+- [x] Vercel prep (not yet deployed): `vercel.json` (security headers incl. a strict CSP that was tested against a full session: WebGL, sounds incl. data: URL, Share, Save blob, About, reset; long immutable cache for hashed `/assets/*`; 1-day + stale-while-revalidate for the unhashed `/fonts /models /buttons /background /stickers`), `engines.node >=20.19.0` (Vite 8), `.vercel` in .gitignore, and `scripts/make-sticker-previews.mjs` never fails the build if `sharp` can't load (committed previews are used; the app falls back to the original PNG). Vercel setup = import the GitHub repo (framework Vite, build `npm run build`, output `dist`, no env vars). Use the production URL / a custom domain for NFC tags and QR codes (preview URLs are behind Vercel login by default). Hobby plan is for non-commercial use.
+
+Open questions for the user: approve creating the Vercel project / pushing (deploys are outward-facing).
 
 Current task:
 
-Phase 14 — Production audit (full pass: accessibility, mobile Safari behaviour, hosting/deploy, security headers, final checklist against this document).
+Phase 14 — Production audit (full pass: accessibility, mobile Safari behaviour, final checklist against this document), then first Vercel deploy once the user approves.
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.
