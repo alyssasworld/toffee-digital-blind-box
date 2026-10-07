@@ -698,8 +698,10 @@ Known to-dos:
 
 - [x] Phase 5 — flaps open: after the shake, stage OPENING: front flap (0s) and back flap (0.1s) swing up/out ~118° with a springy overshoot, then side flaps (0.36s/0.42s) follow (the sides sit UNDER the front/back flaps in the model, so opening them earlier clips through). 0.6s reveal pause, then stage OPENED (~3.8s from tap; ~1.8s with reduced motion). Pure functions in `src/utils/boxMotion.js`, values in `TIMING.flaps` etc. A numeric collision check against the real GLB geometry found no flap clipping. Camera eases to a wider/higher "open" framing so the flaps and later the sticker stay on screen (`CAMERA.open` in BoxScene.jsx).
 
+- [x] Phase 6 — stickers: data-driven list in `src/data/stickers.js` (id/name/file/rarity/weight; dev-mode warnings for bad entries), reusable `pickWeighted` in `src/utils/randomSticker.js` (ignores invalid weights, null if nothing pickable). Sticker is picked once at tap time in `startOpening` (App.jsx, guarded by the stage lock), held in `sticker` state until reset, and its PNG starts preloading at the tap. Sticker names "Agent Mode"/"Shrimp Mode" are placeholders derived from file names. Both are weight 10 (equal). Rarity labels in `RARITIES`; not shown yet.
+
 Current task:
 
-Phase 6 — sticker data + weighted random selection (picked once at tap time, in `startOpening` in App.jsx).
+Phase 7 — sticker emergence animation (sticker rises out of the open box when stage reaches OPENED).
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.

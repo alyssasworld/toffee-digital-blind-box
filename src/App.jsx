@@ -2,10 +2,13 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import BoxScene from './components/BoxScene.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { STAGE } from './config.js'
+import { pickRandomSticker } from './utils/randomSticker.js'
+import { preloadImage } from './utils/preloadImage.js'
 
 export default function App() {
   const [ready, setReady] = useState(false)
   const [stage, setStage] = useState(STAGE.IDLE)
+  const [sticker, setSticker] = useState(null) // chosen when the box is tapped; fixed until the next reveal
   const stageRef = useRef(STAGE.IDLE) // updated instantly, so a fast double-tap can't start twice
 
   const startOpening = useCallback(() => {
@@ -13,7 +16,12 @@ export default function App() {
     stageRef.current = STAGE.SHAKING
     setStage(STAGE.SHAKING)
     if (import.meta.env.DEV) console.debug('[blind box] opening started')
-    // Phase 6 will pick the random sticker here, once per reveal.
+
+    // Pick the sticker now (not on page load). The guard above means this runs once per reveal.
+    const picked = pickRandomSticker()
+    setSticker(picked)
+    if (picked) preloadImage(picked.file) // start downloading it while the box shakes
+    if (import.meta.env.DEV) console.debug('[blind box] picked sticker', picked?.id ?? 'none')
   }, [])
 
   const finishShake = useCallback(() => {
@@ -25,9 +33,9 @@ export default function App() {
   const finishOpening = useCallback(() => {
     stageRef.current = STAGE.OPENED
     setStage(STAGE.OPENED)
-    if (import.meta.env.DEV) console.debug('[blind box] box opened')
+    if (import.meta.env.DEV) console.debug('[blind box] box opened with sticker', sticker?.id ?? 'none')
     // Phase 7: the sticker emerges from here.
-  }, [])
+  }, [sticker])
 
   // Dev-only shortcut for testing: press R to put the box back to idle.
   // (Phase 11 adds the real "Open another box" button.)
@@ -37,6 +45,7 @@ export default function App() {
       if (e.key !== 'r' && e.key !== 'R') return
       stageRef.current = STAGE.IDLE
       setStage(STAGE.IDLE)
+      setSticker(null)
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
