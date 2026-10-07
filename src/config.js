@@ -1,3 +1,7 @@
+// Full-screen picture behind everything (set to null for a plain colour). It is drawn with hard
+// pixel edges, so a low-resolution pixel-art image stays crisp at any screen size.
+export const BACKDROP_IMAGE = '/background/sky-pixel-bg.png'
+
 // Stages of one reveal. Later phases add more (opening, revealing, revealed...).
 export const STAGE = {
   IDLE: 'idle', // closed box, waiting for a tap
@@ -70,4 +74,14 @@ export const STICKER_LAYOUT = {
   finalHeightFrac: 0.46, // ...and at most this fraction of the screen height
   finalCenterFromTop: 0.4, // where its centre sits: 0 = top of screen, 1 = bottom
   hoverDistanceFrac: 0.55, // how far toward the camera it settles (0.55 = about halfway; keeps it in front of the flaps)
+}
+
+// Sound mix. Each value multiplies that sound's volume (1 = as recorded). The clips were
+// recorded at different loudness, so these even them out. `delay` shifts a sound later, in seconds.
+export const SOUND_MIX = {
+  master: 0.9,
+  tap: { volume: 0.8, delay: 0 }, // the pop when you tap the box
+  open: { volume: 1.15, delay: 0 }, // the flaps swinging open
+  reveal: { volume: 1.2, delay: 0 }, // the glitter as the sticker rises out
+  again: { volume: 0.55, delay: 0 }, // "Open another box"
 }

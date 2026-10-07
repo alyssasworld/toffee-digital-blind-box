@@ -710,7 +710,7 @@ Notes for later phases:
 
 - [x] Phase 8 — result UI + visual identity: Pixelify Sans (self-hosted `public/fonts/`, OFL, preloaded; matches the button art) as the global font; "Open Me!" heading (fades on tap); pixel-art buttons from `public/buttons/` via `PixelButton.jsx` (label baked into the image, so `aria-label` carries the text; invisible padding gives 47px+ tap areas). First screen: heading + box + Open button. REVEALED: `RevealResult.jsx` (name, rarity, role=status) + `ActionButtons.jsx` (Save, Share, Open another). Camera `revealed` framing now lifts the box fully out of the bottom of the screen so text sits on a clean background. "Open another" currently calls `resetBox` (instant reset; Phase 11 polishes it) and reuses `open_button.png` until a dedicated `open_another` image is added (`BUTTON_IMAGES.openAnother` in ActionButtons.jsx). Save/Share are rendered but inert until Phases 9/10. `.backdrop` layer + `--backdrop-image` CSS variable are ready for a background picture.
 
-Pending from the user: background image.
+Pending from the user: nothing blocking.
 
 Notes:
 
@@ -739,7 +739,12 @@ Open questions for the user: (1) sound — `sounds/*.MP3` are still 4 identical 
 
 - [x] Footer + About + new button (after Phase 13): `Footer.jsx` (About + GitHub links, 44px tap targets, hidden/untabbable while the box animates, last in DOM order), `AboutSheet.jsx` (role=dialog, aria-modal, Esc / tap-outside / Close, Tab trapped, focus returns to the About link), copy and GitHub URL in `src/data/about.js` (the About text was lightly proofread: capital "I", "every time", stray "!." fixed, split into 4 paragraphs). `--footer-space` CSS variable reserves room for the footer above the Open button / result block. `open_another_button.png` (yellow, B icon) is wired in `ActionButtons.jsx`. Decision recorded: Save/Share keep the full-size original PNG (user chose fidelity over data savings).
 
-Open questions for the user: sound (the four `sounds/*.MP3` files are byte-identical copies of ONE 3.9s clip: click ~0s, rustle ~0.9s, big sparkly swell peaking ~2.4s; looks like a single combined "opening sequence" track; they live in `/sounds` outside `public`, so they would need importing via Vite), and the avoid-repeat rule (options: strict no-repeat = bad with 2 stickers (strict alternation); soft penalty; or cap streaks at 2).
+- [x] Background + sound (after the footer): 
+  - Background `public/background/sky-pixel-bg.png` (1920x1280, true pixel-art: ~17px blocks, i.e. ~112x75 art pixels). Set once in `BACKDROP_IMAGE` (src/config.js); drawn with `image-rendering: pixelated`, fades in when loaded; page/boot colour is the sky blue (`--bg`) so nothing flashes. Text on the sky is cream (`--paper`) with a hard navy pixel shadow (`--ink`); panels (About, error screens) stay cream. Art-pixel size on screen: ~11px phone, ~13px laptop, ~17px 1080p, ~23px 1440p. Closed-box framing got more headroom (`fitHalfHeight` 1.42) so the box clears the heading on wide screens.
+  - Sound: `src/audio/sounds.js` (Web Audio; files in `/sounds`, imported via Vite `?url`), `hooks/useSounds.js`, `components/SoundToggle.jsx` (pixel speaker button, top right, last in tab order, choice saved in localStorage). Mapping: tap -> `user_clicks_open_pop`, flaps opening -> `opening_box`, sticker rising -> `open_package_glitter`, Open another -> `open_again`. Volumes/delays in `SOUND_MIX` (src/config.js; the clips differ a lot in loudness). The audio engine is created suspended and woken by the first tap/key (phone rule); the first sound starts ~80ms late while it wakes. Web Audio respects the iPhone silent switch (by design). Missing/failed sound files => silent, no errors. Verified timings: pop @0s, box opening @2.27s, glitter @3.87s.
+  - Sticker caption text in the artwork is olive/yellow and has low contrast against the blue sky (still readable); the sticker art itself is unchanged.
+
+Open questions for the user: avoid-repeat rule (recommended: cap streaks at 2 in a row); where it will be hosted (Phase 14).
 
 Current task:
 

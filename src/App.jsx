@@ -6,11 +6,13 @@ import ErrorScreen from './components/ErrorScreen.jsx'
 import RevealResult from './components/RevealResult.jsx'
 import Footer from './components/Footer.jsx'
 import AboutSheet from './components/AboutSheet.jsx'
+import SoundToggle from './components/SoundToggle.jsx'
 import { BUTTON_IMAGES, preloadActionImages } from './components/ActionButtons.jsx'
-import { STAGE, TIMING } from './config.js'
+import { BACKDROP_IMAGE, STAGE, TIMING } from './config.js'
 import { prefersReducedMotion } from './utils/motionPreference.js'
 import { pickRandomSticker } from './utils/randomSticker.js'
 import { useStickerActions } from './hooks/useStickerActions.js'
+import { useSounds } from './hooks/useSounds.js'
 
 export default function App() {
   const [ready, setReady] = useState(false)
@@ -20,6 +22,7 @@ export default function App() {
   const [fatal, setFatal] = useState(null) // an unrecoverable problem: 'stickers' | 'context'
   const [waitingForSticker, setWaitingForSticker] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [backdropReady, setBackdropReady] = useState(false)
   const stickerRef = useRef(null) // the current sticker, readable from callbacks without making them change
   const failedStickers = useRef(new Set()) // ids of stickers whose image would not load (this visit)
   const stageRef = useRef(STAGE.IDLE) // updated instantly, so a fast double-tap can't start twice
@@ -121,6 +124,14 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [hardReset])
 
+  // Fade the background picture in once it has downloaded (until then the page is its average colour).
+  useEffect(() => {
+    if (!BACKDROP_IMAGE) return
+    const image = new Image()
+    image.onload = () => setBackdropReady(true)
+    image.src = BACKDROP_IMAGE
+  }, [])
+
   // Fade the loading screen out once the box is ready, then remove it.
   useEffect(() => {
     if (!ready) return
@@ -138,6 +149,7 @@ export default function App() {
   const handleReady = useCallback(() => setReady(true), []) // stable, so the scene is not re-set up on every render
   const locked = stage !== STAGE.IDLE
   // Starts fetching the sticker file for Save/Share once the sticker is on its way out of the box.
+  const { muted, toggleMuted } = useSounds(stage)
   const { save, share, notice } = useStickerActions(sticker, stage === STAGE.REVEALING || stage === STAGE.REVEALED)
 
   if (fatal) return <ErrorScreen kind={fatal} />
@@ -145,7 +157,10 @@ export default function App() {
   return (
     <ErrorBoundary>
       <main className="app">
-        <div className="backdrop" />
+        <div
+          className={`backdrop${backdropReady ? ' backdrop--ready' : ''}`}
+          style={BACKDROP_IMAGE ? { '--backdrop-image': `url(${BACKDROP_IMAGE})` } : undefined}
+        />
         <BoxScene
           stage={stage}
           sticker={sticker}
@@ -201,6 +216,7 @@ export default function App() {
         {ready && (
           <Footer hidden={aboutOpen || (stage !== STAGE.IDLE && stage !== STAGE.REVEALED)} onAbout={openAbout} />
         )}
+        {ready && <SoundToggle muted={muted} onToggle={toggleMuted} />}
         {aboutOpen && <AboutSheet onClose={closeAbout} />}
       </main>
     </ErrorBoundary>

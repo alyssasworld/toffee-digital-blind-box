@@ -8,7 +8,8 @@
 }
 
 :root {
-  --bg: #fbf4dc;
+  --bg: #0b82e8; /* the sky's main blue: the page colour while the picture loads */
+  --paper: #fbf4dc; /* the cream used for text on the sky, and for panels */
   --ink: #2a2f5c;
   --font: 'Pixelify Sans', ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, sans-serif;
   /* To use a background picture: --backdrop-image: url('/backgrounds/your-image.webp'); */
@@ -48,8 +49,21 @@ body,
 .backdrop {
   position: absolute;
   inset: 0;
-  background: var(--backdrop-image) center / cover no-repeat;
+  background: var(--backdrop-image, none) center / cover no-repeat;
+  image-rendering: pixelated; /* hard block edges instead of a blurry stretch */
+  opacity: 0;
+  transition: opacity 0.6s ease;
   pointer-events: none;
+}
+
+.backdrop--ready {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backdrop {
+    transition: none;
+  }
 }
 
 .scene {
@@ -71,13 +85,15 @@ body,
   text-align: center;
   font-size: 1.2rem;
   letter-spacing: 0.04em;
+  color: var(--paper);
+  text-shadow: 0.08em 0.1em 0 var(--ink);
   pointer-events: none;
   animation: note-in 0.4s ease 1s both;
 }
 
 @keyframes note-in {
   from { opacity: 0; }
-  to { opacity: 0.8; }
+  to { opacity: 1; }
 }
 
 /* ---------- Heading ---------- */
@@ -92,6 +108,8 @@ body,
   font-size: clamp(2.4rem, 12vw, 3.6rem);
   font-weight: 700;
   line-height: 1;
+  color: var(--paper);
+  text-shadow: 0.06em 0.08em 0 var(--ink);
   pointer-events: none;
   transition: opacity 0.3s ease;
 }
@@ -186,6 +204,8 @@ body,
   font-size: clamp(1.8rem, 8.5vw, 2.4rem);
   font-weight: 700;
   line-height: 1.05;
+  color: var(--paper);
+  text-shadow: 0.07em 0.09em 0 var(--ink);
 }
 
 .sticker-rarity {
@@ -193,7 +213,8 @@ body,
   font-size: clamp(1rem, 4.2vw, 1.2rem);
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  opacity: 0.7;
+  color: var(--paper);
+  text-shadow: 0.1em 0.12em 0 var(--ink);
 }
 
 .actions {
@@ -236,6 +257,8 @@ body,
 /* Brief message under the buttons (e.g. "saved instead", or something went wrong). */
 .result-notice {
   margin: 0;
+  color: var(--paper);
+  text-shadow: 0.08em 0.1em 0 var(--ink);
   max-width: 22rem;
   font-size: 1rem;
   line-height: 1.25;
@@ -243,6 +266,7 @@ body,
 
 /* Shown if something stops the experience from starting (see ErrorScreen.jsx). */
 .fallback {
+  background: var(--paper);
   display: grid;
   align-content: center;
   justify-items: center;
@@ -325,9 +349,9 @@ body,
   padding: 0.5rem 0.8rem;
   border: 0;
   background: none;
-  color: inherit;
+  color: var(--paper);
+  text-shadow: 0.08em 0.1em 0 var(--ink);
   font: inherit;
-  opacity: 0.8;
   text-decoration: underline;
   text-underline-offset: 0.25em;
   cursor: pointer;
@@ -337,7 +361,7 @@ body,
 
 .footer-link:focus-visible,
 .about a:focus-visible {
-  outline: 3px solid var(--ink);
+  outline: 3px solid var(--paper);
   outline-offset: 2px;
 }
 
@@ -408,4 +432,36 @@ body,
   overflow: hidden;
   clip: rect(0 0 0 0);
   white-space: nowrap;
+}
+
+/* ---------- Sound on/off button ---------- */
+.sound-toggle {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + 0.5rem);
+  right: calc(env(safe-area-inset-right) + 0.5rem);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 2.75rem; /* big enough to tap */
+  height: 2.75rem;
+  padding: 0;
+  border: 3px solid var(--ink);
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.sound-toggle svg {
+  width: 1.5rem;
+  height: 1.5rem;
+  fill: currentColor;
+}
+
+.sound-toggle:active {
+  transform: translateY(2px);
+}
+
+.sound-toggle:focus-visible {
+  outline: 3px solid var(--paper);
+  outline-offset: 2px;
 }

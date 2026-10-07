@@ -18,7 +18,7 @@ const CAMERA = {
   direction: [1, 0.55, 1.6], // 3/4 angle, front-right and a little above
   // target = the point the camera looks at. Raising it moves the box DOWN on screen.
   // fitHalfWidth/Height = half the width/height (model units) that must stay on screen.
-  closed: { target: [0, 0.6, 0], fitHalfWidth: 0.9, fitHalfHeight: 1.2 },
+  closed: { target: [0, 0.6, 0], fitHalfWidth: 0.9, fitHalfHeight: 1.42 },
   open: { target: [0, 1.0, 0], fitHalfWidth: 1.15, fitHalfHeight: 1.55 },
   revealed: { target: [0, 6.5, 0], fitHalfWidth: 1.15, fitHalfHeight: 1.55 },
   transitionSpeed: 4, // how quickly the camera eases between framings (higher = faster)
