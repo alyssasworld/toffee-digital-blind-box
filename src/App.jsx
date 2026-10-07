@@ -8,6 +8,11 @@ export default function App() {
     <main className="app">
       <BoxScene onReady={() => setReady(true)} />
       {!ready && <div className="loading" aria-live="polite">Loading…</div>}
+      {ready && (
+        <footer className="hint">
+          <p>Tap to open</p>
+        </footer>
+      )}
     </main>
   )
 }

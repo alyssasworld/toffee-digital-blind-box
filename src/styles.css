@@ -18,6 +18,9 @@ body,
   color: var(--ink);
   font-family: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, sans-serif;
   -webkit-tap-highlight-color: transparent;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
   overscroll-behavior: none;
 }
 
@@ -42,4 +45,36 @@ body,
   font-size: 1rem;
   letter-spacing: 0.04em;
   opacity: 0.7;
+}
+
+/* Bottom hint, kept inside the safe area and clear of the home indicator. */
+.hint {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + clamp(1.5rem, 6dvh, 3.5rem));
+  display: flex;
+  justify-content: center;
+  padding-inline: 1rem;
+  pointer-events: none; /* never blocks taps on the box */
+}
+
+.hint p {
+  margin: 0;
+  font-size: clamp(1.1rem, 4.5vw, 1.4rem);
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .hint p {
+    animation: hint-pulse 2.4s ease-in-out infinite;
+  }
+}
+
+@keyframes hint-pulse {
+  0%, 100% { opacity: 0.55; transform: translateY(0); }
+  50% { opacity: 1; transform: translateY(-3px); }
 }

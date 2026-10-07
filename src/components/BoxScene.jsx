@@ -7,13 +7,16 @@ import BlindBox from './BlindBox.jsx'
 // Camera framing: a 3/4 view looking slightly down at the box.
 const CAMERA = {
   fov: 30,
-  target: [0, 0.75, 0], // roughly the vertical centre of the box
+  target: [0, 0.6, 0], // below the box centre, so the box sits a little above the middle of the screen (room for the hint)
   direction: [1, 0.55, 1.6], // 3/4 angle, front-right and a little above
-  fitRadius: 1.15, // how much of the scene must stay visible (box plus margin)
+  // Half the width/height (in model units) that must stay on screen, including margin.
+  // The box seen from 3/4 is roughly 1.7 wide x 1.5 tall; the extra height leaves room for the hint.
+  fitHalfWidth: 0.9,
+  fitHalfHeight: 1.2,
 }
 
 // Keeps the whole box in view at any screen shape by moving the camera
-// back on narrow (portrait) screens.
+// back on narrow (portrait) or short (landscape) screens.
 function ResponsiveCamera() {
   const camera = useThree((s) => s.camera)
   const aspect = useThree((s) => s.size.width / s.size.height)
@@ -21,8 +24,11 @@ function ResponsiveCamera() {
   useEffect(() => {
     const vFov = (camera.fov * Math.PI) / 180
     const hFov = 2 * Math.atan(Math.tan(vFov / 2) * aspect)
-    const limitingFov = Math.min(vFov, hFov)
-    const distance = CAMERA.fitRadius / Math.sin(limitingFov / 2)
+    // Back up far enough to fit the box's width AND height; whichever needs more distance wins.
+    const distance = Math.max(
+      CAMERA.fitHalfWidth / Math.tan(hFov / 2),
+      CAMERA.fitHalfHeight / Math.tan(vFov / 2),
+    )
 
     const [dx, dy, dz] = CAMERA.direction
     const len = Math.hypot(dx, dy, dz)

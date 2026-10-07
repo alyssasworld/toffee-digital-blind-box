@@ -680,6 +680,7 @@ Completed:
 - [x] Vite + React + R3F project set up
 - [x] GitHub repository
 - [x] Phase 1 — 3D box renders, centred, responsive camera, true colours (no tone mapping)
+- [x] Phase 2 — responsive mobile layout: 100dvh, safe-area padding, camera fits box width/height at any aspect, "Tap to open" hint (pulse disabled for reduced motion), no horizontal overflow (checked 375x667, 390x844, 430x932, 820x600, 1280x800)
 
 GLB hierarchy: `Box_Root` > `Box_Body`, `Flap_Front`, `Flap_Left`, `Flap_Right`, `Flap_Back`.
 Each flap's origin is on its hinge, so it opens by rotating its node.
@@ -687,10 +688,11 @@ Each flap's origin is on its hinge, so it opens by rotating its node.
 Known to-dos:
 
 - `sounds/*.MP3` are 4 identical placeholder files; replace before adding sound.
+- Asset optimisation (stickers, GLB texture) is deliberately deferred to Phase 13 — do not shrink assets before then.
 - Sticker PNGs are 3000x3000 / ~2.5 MB each; make ~1024px WebP copies for on-screen reveal, keep originals for Save/Share.
 
 Current task:
 
-Phase 2 — responsive mobile layout (then Phase 3 tap interaction).
+Phase 3 — tap interaction.
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.
