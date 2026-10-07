@@ -696,8 +696,10 @@ Known to-dos:
 
 - [x] Phase 4 — box shake: tap -> anticipation squish (0.28s) -> shake building 40%->100% (1.2s) -> settle (0.35s) -> pause (0.4s) -> stage SETTLED (~2.23s total). Pure time-based pose in `src/utils/boxMotion.js`, all values in `TIMING` (`src/config.js`). Reduced motion skips the shake (~0.68s). Dev-only: press R to reset to idle while testing (Phase 11 adds the real button).
 
+- [x] Phase 5 — flaps open: after the shake, stage OPENING: front flap (0s) and back flap (0.1s) swing up/out ~118° with a springy overshoot, then side flaps (0.36s/0.42s) follow (the sides sit UNDER the front/back flaps in the model, so opening them earlier clips through). 0.6s reveal pause, then stage OPENED (~3.8s from tap; ~1.8s with reduced motion). Pure functions in `src/utils/boxMotion.js`, values in `TIMING.flaps` etc. A numeric collision check against the real GLB geometry found no flap clipping. Camera eases to a wider/higher "open" framing so the flaps and later the sticker stay on screen (`CAMERA.open` in BoxScene.jsx).
+
 Current task:
 
-Phase 5 — lid (flap) opening, triggered when stage reaches SETTLED.
+Phase 6 — sticker data + weighted random selection (picked once at tap time, in `startOpening` in App.jsx).
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.

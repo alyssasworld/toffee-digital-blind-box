@@ -17,10 +17,16 @@ export default function App() {
   }, [])
 
   const finishShake = useCallback(() => {
-    stageRef.current = STAGE.SETTLED
-    setStage(STAGE.SETTLED)
+    stageRef.current = STAGE.OPENING
+    setStage(STAGE.OPENING)
     if (import.meta.env.DEV) console.debug('[blind box] shake finished')
-    // Phase 5: the lid opens from here.
+  }, [])
+
+  const finishOpening = useCallback(() => {
+    stageRef.current = STAGE.OPENED
+    setStage(STAGE.OPENED)
+    if (import.meta.env.DEV) console.debug('[blind box] box opened')
+    // Phase 7: the sticker emerges from here.
   }, [])
 
   // Dev-only shortcut for testing: press R to put the box back to idle.
@@ -41,7 +47,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <main className="app">
-        <BoxScene stage={stage} onTap={startOpening} onShakeDone={finishShake} onReady={() => setReady(true)} />
+        <BoxScene stage={stage} onTap={startOpening} onShakeDone={finishShake} onOpenDone={finishOpening} onReady={() => setReady(true)} />
         {!ready && <div className="loading" aria-live="polite">Loading…</div>}
         {ready && (
           <button type="button" className="hint" onClick={startOpening} disabled={locked}>

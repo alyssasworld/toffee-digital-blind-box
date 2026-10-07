@@ -2,7 +2,14 @@ import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
 import { STAGE } from '../config.js'
-import { REST_POSE, shakePose, shakeTotalDuration } from '../utils/boxMotion.js'
+import {
+  FLAPS_CLOSED,
+  REST_POSE,
+  flapAngles,
+  openTotalDuration,
+  shakePose,
+  shakeTotalDuration,
+} from '../utils/boxMotion.js'
 
 export const BOX_MODEL_URL = '/models/toffee_box.glb'
 
@@ -19,10 +26,21 @@ function applyPose(root, { squish, tilt, twist, slide }) {
   root.position.x = slide
 }
 
-export default function BlindBox({ stage, onTap, onShakeDone, onReady, ...props }) {
+// Each flap's origin is on its hinge, so opening a flap is just a rotation. The sign
+// of each axis makes the flap swing up and outward, away from the box opening.
+function applyFlaps(flaps, angles) {
+  flaps.Flap_Front.rotation.x = angles.front
+  flaps.Flap_Back.rotation.x = -angles.back
+  flaps.Flap_Left.rotation.z = angles.left
+  flaps.Flap_Right.rotation.z = -angles.right
+}
+
+export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onReady, ...props }) {
   const { scene, nodes } = useGLTF(BOX_MODEL_URL)
   const startTime = useRef(null) // clock time when the tap happened
-  const doneSent = useRef(false)
+  const openStart = useRef(null) // clock time when the flaps began to open
+  const shakeDoneSent = useRef(false)
+  const openDoneSent = useRef(false)
 
   // References to the movable parts, for the shake/open animations.
   const parts = useMemo(
@@ -42,26 +60,42 @@ export default function BlindBox({ stage, onTap, onShakeDone, onReady, ...props 
     onReady?.()
   }, [parts, onReady])
 
-  // Drive the box from the shake timeline. Everything is a function of time since the tap.
+  // Drive the box from the timelines. Everything is a function of time since the stage began.
   useFrame(({ clock }) => {
+    const reduced = prefersReducedMotion()
+
     if (stage === STAGE.IDLE) {
       startTime.current = null
-      doneSent.current = false
+      openStart.current = null
+      shakeDoneSent.current = false
+      openDoneSent.current = false
       applyPose(parts.root, REST_POSE)
+      applyFlaps(parts.flaps, FLAPS_CLOSED)
       return
     }
-    if (stage !== STAGE.SHAKING) return
 
-    if (startTime.current === null) startTime.current = clock.elapsedTime
-    const reduced = prefersReducedMotion()
-    const t = clock.elapsedTime - startTime.current
-
-    applyPose(parts.root, shakePose(t, reduced))
-
-    if (t >= shakeTotalDuration(reduced) && !doneSent.current) {
-      doneSent.current = true
-      onShakeDone?.()
+    if (stage === STAGE.SHAKING) {
+      if (startTime.current === null) startTime.current = clock.elapsedTime
+      const t = clock.elapsedTime - startTime.current
+      applyPose(parts.root, shakePose(t, reduced))
+      if (t >= shakeTotalDuration(reduced) && !shakeDoneSent.current) {
+        shakeDoneSent.current = true
+        onShakeDone?.()
+      }
+      return
     }
+
+    if (stage === STAGE.OPENING) {
+      if (openStart.current === null) openStart.current = clock.elapsedTime
+      const t = clock.elapsedTime - openStart.current
+      applyPose(parts.root, REST_POSE)
+      applyFlaps(parts.flaps, flapAngles(t, reduced))
+      if (t >= openTotalDuration(reduced) && !openDoneSent.current) {
+        openDoneSent.current = true
+        onOpenDone?.()
+      }
+    }
+    // OPENED: nothing to do, the flaps stay where the last OPENING frame left them.
   })
 
   const idle = stage === STAGE.IDLE
