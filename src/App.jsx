@@ -4,6 +4,8 @@ import PixelButton from './components/PixelButton.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import ErrorScreen from './components/ErrorScreen.jsx'
 import RevealResult from './components/RevealResult.jsx'
+import Footer from './components/Footer.jsx'
+import AboutSheet from './components/AboutSheet.jsx'
 import { BUTTON_IMAGES, preloadActionImages } from './components/ActionButtons.jsx'
 import { STAGE, TIMING } from './config.js'
 import { prefersReducedMotion } from './utils/motionPreference.js'
@@ -17,6 +19,7 @@ export default function App() {
   const [bootVisible, setBootVisible] = useState(true) // the loading screen, kept briefly so it can fade out
   const [fatal, setFatal] = useState(null) // an unrecoverable problem: 'stickers' | 'context'
   const [waitingForSticker, setWaitingForSticker] = useState(false)
+  const [aboutOpen, setAboutOpen] = useState(false)
   const stickerRef = useRef(null) // the current sticker, readable from callbacks without making them change
   const failedStickers = useRef(new Set()) // ids of stickers whose image would not load (this visit)
   const stageRef = useRef(STAGE.IDLE) // updated instantly, so a fast double-tap can't start twice
@@ -130,6 +133,8 @@ export default function App() {
     if (ready) preloadActionImages()
   }, [ready])
 
+  const openAbout = useCallback(() => setAboutOpen(true), [])
+  const closeAbout = useCallback(() => setAboutOpen(false), [])
   const handleReady = useCallback(() => setReady(true), []) // stable, so the scene is not re-set up on every render
   const locked = stage !== STAGE.IDLE
   // Starts fetching the sticker file for Save/Share once the sticker is on its way out of the box.
@@ -192,6 +197,11 @@ export default function App() {
             onOpenAnother={openAnother}
           />
         )}
+        {/* Last in the page, so keyboard users reach the main buttons first. */}
+        {ready && (
+          <Footer hidden={aboutOpen || (stage !== STAGE.IDLE && stage !== STAGE.REVEALED)} onAbout={openAbout} />
+        )}
+        {aboutOpen && <AboutSheet onClose={closeAbout} />}
       </main>
     </ErrorBoundary>
   )

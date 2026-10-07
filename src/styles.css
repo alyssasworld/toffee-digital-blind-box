@@ -13,6 +13,7 @@
   --font: 'Pixelify Sans', ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, sans-serif;
   /* To use a background picture: --backdrop-image: url('/backgrounds/your-image.webp'); */
   --backdrop-image: none;
+  --footer-space: 2.6rem; /* room kept free at the bottom for the About / GitHub links */
   color-scheme: light;
 }
 
@@ -64,7 +65,7 @@ body,
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(env(safe-area-inset-bottom) + clamp(1.5rem, 6dvh, 3.5rem));
+  bottom: calc(env(safe-area-inset-bottom) + var(--footer-space) + clamp(0.75rem, 4dvh, 2.5rem));
   margin: 0;
   padding-inline: 1rem;
   text-align: center;
@@ -133,7 +134,7 @@ body,
   left: 0;
   right: 0;
   margin-inline: auto; /* centres it without a transform, so the press effect can't knock it sideways */
-  bottom: calc(env(safe-area-inset-bottom) + clamp(1rem, 4dvh, 2.5rem));
+  bottom: calc(env(safe-area-inset-bottom) + var(--footer-space) + clamp(0.5rem, 3dvh, 1.75rem));
   width: clamp(11rem, 58vw, 15rem);
   transition: opacity 0.25s ease, transform 0.08s ease;
 }
@@ -161,7 +162,7 @@ body,
   position: absolute;
   left: 0;
   right: 0;
-  bottom: calc(env(safe-area-inset-bottom) + clamp(1rem, 3dvh, 2rem));
+  bottom: calc(env(safe-area-inset-bottom) + var(--footer-space) + clamp(0.25rem, 1.5dvh, 1rem));
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -263,7 +264,8 @@ body,
   line-height: 1.4;
 }
 
-.fallback-button {
+.fallback-button,
+.text-button {
   margin-top: 0.5rem;
   min-height: 3rem;
   padding: 0.5rem 1.5rem;
@@ -277,11 +279,13 @@ body,
   cursor: pointer;
 }
 
-.fallback-button:active {
+.fallback-button:active,
+.text-button:active {
   transform: translateY(2px);
 }
 
-.fallback-button:focus-visible {
+.fallback-button:focus-visible,
+.text-button:focus-visible {
   outline: 3px solid var(--ink);
   outline-offset: 3px;
 }
@@ -291,4 +295,117 @@ body,
   overflow-x: auto;
   font-size: 0.8rem;
   opacity: 0.7;
+}
+
+/* ---------- Footer ---------- */
+.footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + 0.15rem);
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.15rem;
+  font-size: 1.05rem;
+  transition: opacity 0.25s ease, visibility 0s;
+}
+
+/* While the box is animating the footer steps aside (and can't be tabbed to). */
+.footer--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0s 0.25s;
+}
+
+.footer-link {
+  min-height: 2.75rem; /* a comfortable tap target */
+  padding: 0.5rem 0.8rem;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  opacity: 0.8;
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+}
+
+.footer-link:focus-visible,
+.about a:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+/* ---------- About panel ---------- */
+.about-backdrop {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  padding-top: calc(env(safe-area-inset-top) + 1rem);
+  padding-bottom: calc(env(safe-area-inset-bottom) + 1rem);
+  background: rgba(42, 47, 92, 0.4);
+  animation: fade-in 0.2s ease both;
+}
+
+.about {
+  width: min(100%, 26rem);
+  max-height: 100%;
+  overflow-y: auto;
+  padding: 1.25rem 1.25rem 1.5rem;
+  border: 3px solid var(--ink);
+  background: #fff8e0;
+  user-select: text;
+  -webkit-user-select: text;
+  overscroll-behavior: contain;
+}
+
+.about h2 {
+  margin: 0 0 0.75rem;
+  font-size: 1.9rem;
+  line-height: 1;
+}
+
+.about p {
+  margin: 0 0 0.85rem;
+  font-size: 1.1rem;
+  line-height: 1.4;
+}
+
+.about .about-links {
+  margin-bottom: 1.1rem;
+}
+
+.about a {
+  color: inherit;
+  text-underline-offset: 0.25em;
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .about-backdrop {
+    animation: none;
+  }
+}
+
+/* Text for screen readers only. */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
 }

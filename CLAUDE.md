@@ -710,7 +710,7 @@ Notes for later phases:
 
 - [x] Phase 8 — result UI + visual identity: Pixelify Sans (self-hosted `public/fonts/`, OFL, preloaded; matches the button art) as the global font; "Open Me!" heading (fades on tap); pixel-art buttons from `public/buttons/` via `PixelButton.jsx` (label baked into the image, so `aria-label` carries the text; invisible padding gives 47px+ tap areas). First screen: heading + box + Open button. REVEALED: `RevealResult.jsx` (name, rarity, role=status) + `ActionButtons.jsx` (Save, Share, Open another). Camera `revealed` framing now lifts the box fully out of the bottom of the screen so text sits on a clean background. "Open another" currently calls `resetBox` (instant reset; Phase 11 polishes it) and reuses `open_button.png` until a dedicated `open_another` image is added (`BUTTON_IMAGES.openAnother` in ActionButtons.jsx). Save/Share are rendered but inert until Phases 9/10. `.backdrop` layer + `--backdrop-image` CSS variable are ready for a background picture.
 
-Pending from the user: footer content (About text; GitHub link candidate github.com/alyssapineda/toffee-digital-blind-box), background image, optional `open_another_button.png`.
+Pending from the user: background image.
 
 Notes:
 
@@ -737,7 +737,9 @@ Open questions for the user: (1) sound — `sounds/*.MP3` are still 4 identical 
   - Left as is on purpose: GLB texture (2048px JPEG, 174KB; downscaling would blur the box art), continuous render loop (nothing animates at idle but the scene is cheap), DPR already capped at 2.
   - Hosting note: static files should be served with long-lived caching (hashed `/assets/*` can be immutable; `/stickers`, `/models`, `/buttons` are not hashed) and gzip/brotli for JS/CSS.
 
-Open questions for the user: Save/Share file weight (see below), sound, avoid-repeat rule, footer/About text, background image, `open_another_button.png`.
+- [x] Footer + About + new button (after Phase 13): `Footer.jsx` (About + GitHub links, 44px tap targets, hidden/untabbable while the box animates, last in DOM order), `AboutSheet.jsx` (role=dialog, aria-modal, Esc / tap-outside / Close, Tab trapped, focus returns to the About link), copy and GitHub URL in `src/data/about.js` (the About text was lightly proofread: capital "I", "every time", stray "!." fixed, split into 4 paragraphs). `--footer-space` CSS variable reserves room for the footer above the Open button / result block. `open_another_button.png` (yellow, B icon) is wired in `ActionButtons.jsx`. Decision recorded: Save/Share keep the full-size original PNG (user chose fidelity over data savings).
+
+Open questions for the user: sound (the four `sounds/*.MP3` files are byte-identical copies of ONE 3.9s clip: click ~0s, rustle ~0.9s, big sparkly swell peaking ~2.4s; looks like a single combined "opening sequence" track; they live in `/sounds` outside `public`, so they would need importing via Vite), and the avoid-repeat rule (options: strict no-repeat = bad with 2 stickers (strict alternation); soft penalty; or cap streaks at 2).
 
 Current task:
 

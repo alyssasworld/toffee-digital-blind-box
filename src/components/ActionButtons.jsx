@@ -1,12 +1,11 @@
 import PixelButton from './PixelButton.jsx'
 
-// The button pictures. To give "Open another" its own artwork, drop the file into
-// /public/buttons/ and change `openAnother` below.
+// The button pictures (all in /public/buttons/).
 export const BUTTON_IMAGES = {
   open: '/buttons/open_button.png',
   save: '/buttons/save_button.png',
   share: '/buttons/share_button.png',
-  openAnother: '/buttons/open_button.png',
+  openAnother: '/buttons/open_another_button.png',
 }
 
 // Starts downloading the result-screen buttons (a few KB each) so they don't pop in late.
