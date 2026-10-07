@@ -3,7 +3,8 @@ export const STAGE = {
   IDLE: 'idle', // closed box, waiting for a tap
   SHAKING: 'shaking', // tap received: anticipation, shake, settle, pause (input locked)
   OPENING: 'opening', // shake finished: the flaps swing open, then a short reveal pause
-  OPENED: 'opened', // box is open and still; Phase 7 brings the sticker out from here
+  REVEALING: 'revealing', // box is open: the sticker rises out and settles in front of it
+  REVEALED: 'revealed', // sticker is in place; Phase 8 shows the name and buttons from here
 }
 
 // Central place for animation timing and feel. Times are in seconds.
@@ -39,4 +40,25 @@ export const TIMING = {
 
   // 6. Reveal pause: the open box sits still for a moment before the sticker comes out.
   revealPause: 0.6,
+
+  // 7. Sticker: rises out of the open box, then travels toward the viewer and settles.
+  stickerRiseDuration: 1.0, // rising up out of the box
+  stickerPresentDuration: 0.9, // flying out to the final spot while growing (starts just before the rise ends)
+  stickerOvershoot: 1.1, // 0 = no bounce when it arrives; higher = bouncier
+  stickerSwayTilt: 0.1, // gentle sideways rocking while it rises, in radians (~6 degrees)
+  stickerSettlePause: 0.5, // a beat after it arrives, before the result screen
+  stickerFloat: 0.008, // the tiny idle bob once settled, as a fraction of screen height (0 = still)
+}
+
+// Where the sticker starts and ends up. Sizes describe the sticker's visible artwork (its
+// transparent margins are ignored). Model units: the box is 1 wide and 1.5 tall.
+export const STICKER_LAYOUT = {
+  startY: 0.5, // height of the artwork's centre while hidden inside the box
+  startFit: 0.75, // the artwork fits inside this square at the start (the box opening is 1.0 wide)
+  rimY: 1.515, // height of the box's top edge
+  clearance: 0.12, // how far above the rim its bottom edge is before it starts growing
+  finalWidthFrac: 0.8, // final artwork width at most this fraction of the screen width...
+  finalHeightFrac: 0.48, // ...and at most this fraction of the screen height
+  finalCenterFromTop: 0.4, // where its centre sits: 0 = top of screen, 1 = bottom
+  hoverDistanceFrac: 0.55, // how far toward the camera it settles (0.55 = about halfway; keeps it in front of the flaps)
 }

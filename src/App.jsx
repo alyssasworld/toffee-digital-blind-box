@@ -3,7 +3,6 @@ import BoxScene from './components/BoxScene.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { STAGE } from './config.js'
 import { pickRandomSticker } from './utils/randomSticker.js'
-import { preloadImage } from './utils/preloadImage.js'
 
 export default function App() {
   const [ready, setReady] = useState(false)
@@ -20,7 +19,7 @@ export default function App() {
     // Pick the sticker now (not on page load). The guard above means this runs once per reveal.
     const picked = pickRandomSticker()
     setSticker(picked)
-    if (picked) preloadImage(picked.file) // start downloading it while the box shakes
+    // StickerReveal starts downloading its image as soon as `sticker` is set, while the box shakes.
     if (import.meta.env.DEV) console.debug('[blind box] picked sticker', picked?.id ?? 'none')
   }, [])
 
@@ -31,10 +30,15 @@ export default function App() {
   }, [])
 
   const finishOpening = useCallback(() => {
-    stageRef.current = STAGE.OPENED
-    setStage(STAGE.OPENED)
-    if (import.meta.env.DEV) console.debug('[blind box] box opened with sticker', sticker?.id ?? 'none')
-    // Phase 7: the sticker emerges from here.
+    stageRef.current = STAGE.REVEALING
+    setStage(STAGE.REVEALING) // the sticker rises out (StickerReveal)
+  }, [])
+
+  const finishReveal = useCallback(() => {
+    stageRef.current = STAGE.REVEALED
+    setStage(STAGE.REVEALED)
+    if (import.meta.env.DEV) console.debug('[blind box] revealed', sticker?.id ?? 'none')
+    // Phase 8: the name, rarity and buttons appear from here.
   }, [sticker])
 
   // Dev-only shortcut for testing: press R to put the box back to idle.
@@ -56,7 +60,14 @@ export default function App() {
   return (
     <ErrorBoundary>
       <main className="app">
-        <BoxScene stage={stage} onTap={startOpening} onShakeDone={finishShake} onOpenDone={finishOpening} onReady={() => setReady(true)} />
+        <BoxScene
+          stage={stage}
+          sticker={sticker}
+          onTap={startOpening}
+          onShakeDone={finishShake}
+          onOpenDone={finishOpening}
+          onRevealDone={finishReveal}
+          onReady={() => setReady(true)} />
         {!ready && <div className="loading" aria-live="polite">Loading…</div>}
         {ready && (
           <button type="button" className="hint" onClick={startOpening} disabled={locked}>

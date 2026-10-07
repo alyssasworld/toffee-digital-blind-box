@@ -700,8 +700,16 @@ Known to-dos:
 
 - [x] Phase 6 — stickers: data-driven list in `src/data/stickers.js` (id/name/file/rarity/weight; dev-mode warnings for bad entries), reusable `pickWeighted` in `src/utils/randomSticker.js` (ignores invalid weights, null if nothing pickable). Sticker is picked once at tap time in `startOpening` (App.jsx, guarded by the stage lock), held in `sticker` state until reset, and its PNG starts preloading at the tap. Sticker names "Agent Mode"/"Shrimp Mode" are placeholders derived from file names. Both are weight 10 (equal). Rarity labels in `RARITIES`; not shown yet.
 
+- [x] Phase 7 — sticker emergence: stages now IDLE > SHAKING > OPENING > REVEALING > REVEALED. `StickerReveal.jsx` renders the sticker as a flat 3D card (so the box walls hide it while inside), loads its texture at tap time and uploads it to the GPU early (`gl.initTexture`) to avoid a mid-animation stutter. It starts small (fits the 1.0-wide opening), rises past the rim, then grows/flies to a camera-relative spot (~80% screen width, centre 40% from top) with a small overshoot and gentle rocking; always faces the camera. Sizing/centring uses the sticker's visible artwork bounds (`utils/imageBounds.js`, 128px downscale, alpha>40) because the PNGs have big, uneven transparent margins. Pure timeline in `utils/stickerMotion.js`; timings in `TIMING`, placement in `STICKER_LAYOUT` (`src/config.js`). Once REVEALED the camera drifts to a `revealed` framing so the box slides down and the sticker is the focus. Missing image => skips the animation, no crash (Phase 12 adds the message). ~5.9s tap->REVEALED (~2.9s reduced motion).
+
+Notes for later phases:
+
+- Sticker PNG art has pale/low-contrast text (e.g. "SHRIMP MODE.") — it reads fine on the cream background but is faint over the box art.
+- 3000px sticker = ~36MB of GPU texture (plus mipmaps). Fine on desktop; check on a real iPhone and downsize in Phase 13 (originals stay for Save/Share).
+- Phase 8 result UI must fit under the sticker (centre ~40% from top); the box is cropped at the bottom of the screen in REVEALED.
+
 Current task:
 
-Phase 7 — sticker emergence animation (sticker rises out of the open box when stage reaches OPENED).
+Phase 8 — result UI (sticker name, rarity if configured, Save / Share / Open another box buttons) shown when stage reaches REVEALED.
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.

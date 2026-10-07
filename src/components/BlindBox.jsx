@@ -95,7 +95,7 @@ export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onRead
         onOpenDone?.()
       }
     }
-    // OPENED: nothing to do, the flaps stay where the last OPENING frame left them.
+    // Later stages: the flaps stay where the last OPENING frame left them.
   })
 
   const idle = stage === STAGE.IDLE
