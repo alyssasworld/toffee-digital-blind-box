@@ -9,8 +9,9 @@ import { STAGE } from '../config.js'
 // Camera framing: a 3/4 view looking slightly down at the box. Three framings:
 //   closed:   tight on the closed box
 //   open:     wider/higher once the flaps are open (they stick up above the box)
-//   revealed: once the sticker has arrived, the camera drifts up so the box slides down
-//             the screen and the sticker (which is fixed relative to the camera) takes centre stage
+//   revealed: once the sticker has arrived, the camera rises so the box drops out of the bottom
+//             of the screen, leaving the sticker (fixed relative to the camera) and the result
+//             text on a clean background
 const CAMERA = {
   fov: 30,
   direction: [1, 0.55, 1.6], // 3/4 angle, front-right and a little above
@@ -18,7 +19,7 @@ const CAMERA = {
   // fitHalfWidth/Height = half the width/height (model units) that must stay on screen.
   closed: { target: [0, 0.6, 0], fitHalfWidth: 0.9, fitHalfHeight: 1.2 },
   open: { target: [0, 1.0, 0], fitHalfWidth: 1.15, fitHalfHeight: 1.55 },
-  revealed: { target: [0, 1.75, 0], fitHalfWidth: 1.15, fitHalfHeight: 1.55 },
+  revealed: { target: [0, 6.5, 0], fitHalfWidth: 1.15, fitHalfHeight: 1.55 },
   transitionSpeed: 4, // how quickly the camera eases between framings (higher = faster)
 }
 

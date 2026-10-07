@@ -708,8 +708,16 @@ Notes for later phases:
 - 3000px sticker = ~36MB of GPU texture (plus mipmaps). Fine on desktop; check on a real iPhone and downsize in Phase 13 (originals stay for Save/Share).
 - Phase 8 result UI must fit under the sticker (centre ~40% from top); the box is cropped at the bottom of the screen in REVEALED.
 
+- [x] Phase 8 — result UI + visual identity: Pixelify Sans (self-hosted `public/fonts/`, OFL, preloaded; matches the button art) as the global font; "Open Me!" heading (fades on tap); pixel-art buttons from `public/buttons/` via `PixelButton.jsx` (label baked into the image, so `aria-label` carries the text; invisible padding gives 47px+ tap areas). First screen: heading + box + Open button. REVEALED: `RevealResult.jsx` (name, rarity, role=status) + `ActionButtons.jsx` (Save, Share, Open another). Camera `revealed` framing now lifts the box fully out of the bottom of the screen so text sits on a clean background. "Open another" currently calls `resetBox` (instant reset; Phase 11 polishes it) and reuses `open_button.png` until a dedicated `open_another` image is added (`BUTTON_IMAGES.openAnother` in ActionButtons.jsx). Save/Share are rendered but inert until Phases 9/10. `.backdrop` layer + `--backdrop-image` CSS variable are ready for a background picture.
+
+Pending from the user: footer content (About text; GitHub link candidate github.com/alyssapineda/toffee-digital-blind-box), background image, optional `open_another_button.png`.
+
+Notes:
+
+- Agent sticker PNG has faint stray marks near its top corners (in the source art).
+
 Current task:
 
-Phase 8 — result UI (sticker name, rarity if configured, Save / Share / Open another box buttons) shown when stage reaches REVEALED.
+Phase 9 — Save: download the original sticker PNG (not a screenshot), filename from the sticker name (e.g. agent-mode.png).
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.

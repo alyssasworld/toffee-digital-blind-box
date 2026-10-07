@@ -58,7 +58,7 @@ export const STICKER_LAYOUT = {
   rimY: 1.515, // height of the box's top edge
   clearance: 0.12, // how far above the rim its bottom edge is before it starts growing
   finalWidthFrac: 0.8, // final artwork width at most this fraction of the screen width...
-  finalHeightFrac: 0.48, // ...and at most this fraction of the screen height
+  finalHeightFrac: 0.46, // ...and at most this fraction of the screen height
   finalCenterFromTop: 0.4, // where its centre sits: 0 = top of screen, 1 = bottom
   hoverDistanceFrac: 0.55, // how far toward the camera it settles (0.55 = about halfway; keeps it in front of the flaps)
 }

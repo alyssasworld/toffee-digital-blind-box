@@ -1,6 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import BoxScene from './components/BoxScene.jsx'
+import PixelButton from './components/PixelButton.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+import RevealResult from './components/RevealResult.jsx'
+import { BUTTON_IMAGES, preloadActionImages } from './components/ActionButtons.jsx'
 import { STAGE } from './config.js'
 import { pickRandomSticker } from './utils/randomSticker.js'
 
@@ -41,25 +44,34 @@ export default function App() {
     // Phase 8: the name, rarity and buttons appear from here.
   }, [sticker])
 
-  // Dev-only shortcut for testing: press R to put the box back to idle.
-  // (Phase 11 adds the real "Open another box" button.)
+  // Back to a closed box with no sticker. Phase 11 will polish this ("Open another box").
+  const resetBox = useCallback(() => {
+    stageRef.current = STAGE.IDLE
+    setStage(STAGE.IDLE)
+    setSticker(null)
+  }, [])
+
+  // Dev-only shortcut for testing: press R to reset.
   useEffect(() => {
     if (!import.meta.env.DEV) return
     const onKey = (e) => {
-      if (e.key !== 'r' && e.key !== 'R') return
-      stageRef.current = STAGE.IDLE
-      setStage(STAGE.IDLE)
-      setSticker(null)
+      if (e.key === 'r' || e.key === 'R') resetBox()
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [])
+  }, [resetBox])
+
+  // Once the box is on screen, fetch the result-screen button pictures in the background.
+  useEffect(() => {
+    if (ready) preloadActionImages()
+  }, [ready])
 
   const locked = stage !== STAGE.IDLE
 
   return (
     <ErrorBoundary>
       <main className="app">
+        <div className="backdrop" />
         <BoxScene
           stage={stage}
           sticker={sticker}
@@ -67,12 +79,22 @@ export default function App() {
           onShakeDone={finishShake}
           onOpenDone={finishOpening}
           onRevealDone={finishReveal}
-          onReady={() => setReady(true)} />
+          onReady={() => setReady(true)}
+        />
         {!ready && <div className="loading" aria-live="polite">Loading…</div>}
+        {ready && <h1 className={`title${locked ? ' title--hidden' : ''}`}>Open Me!</h1>}
         {ready && (
-          <button type="button" className="hint" onClick={startOpening} disabled={locked}>
-            Tap to open
-          </button>
+          <PixelButton
+            src={BUTTON_IMAGES.open}
+            label="Open the box"
+            className="open-cta"
+            onClick={startOpening}
+            disabled={locked}
+          />
+        )}
+        {stage === STAGE.REVEALED && (
+          // Save and Share get wired up in the next phases.
+          <RevealResult sticker={sticker} onOpenAnother={resetBox} />
         )}
       </main>
     </ErrorBoundary>

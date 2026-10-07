@@ -1,6 +1,18 @@
+/* Pixelify Sans (SIL Open Font License, see /public/fonts/OFL.txt). One variable file covers 400-700. */
+@font-face {
+  font-family: 'Pixelify Sans';
+  src: url('/fonts/pixelify-sans-latin.woff2') format('woff2');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: block; /* briefly invisible instead of flashing a non-pixel font */
+}
+
 :root {
   --bg: #fbf4dc;
   --ink: #2a2f5c;
+  --font: 'Pixelify Sans', ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, sans-serif;
+  /* To use a background picture: --backdrop-image: url('/backgrounds/your-image.webp'); */
+  --backdrop-image: none;
   color-scheme: light;
 }
 
@@ -16,7 +28,7 @@ body,
   overflow: hidden;
   background: var(--bg);
   color: var(--ink);
-  font-family: ui-rounded, 'SF Pro Rounded', system-ui, -apple-system, sans-serif;
+  font-family: var(--font);
   -webkit-tap-highlight-color: transparent;
   -webkit-user-select: none;
   user-select: none;
@@ -31,7 +43,17 @@ body,
   padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
 }
 
+/* Full-screen picture layer behind the 3D scene (the scene is transparent). */
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--backdrop-image) center / cover no-repeat;
+  pointer-events: none;
+}
+
 .scene {
+  position: absolute;
+  inset: 0;
   width: 100%;
   height: 100%;
   touch-action: none;
@@ -42,54 +64,150 @@ body,
   inset: 0;
   display: grid;
   place-items: center;
-  font-size: 1rem;
+  font-size: 1.25rem;
   letter-spacing: 0.04em;
   opacity: 0.7;
 }
 
-/* "Tap to open" is a real button: big tap target, keyboard-focusable. */
-.hint {
+/* ---------- Heading ---------- */
+.title {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + clamp(1rem, 4.5dvh, 2.5rem));
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding-inline: 1rem;
+  text-align: center;
+  font-size: clamp(2.4rem, 12vw, 3.6rem);
+  font-weight: 700;
+  line-height: 1;
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.title--hidden {
+  opacity: 0;
+}
+
+/* ---------- Pixel-art buttons (the label is part of the picture) ---------- */
+.pixel-button {
+  display: block;
+  /* The padding is invisible: it just makes the tap area bigger than the picture (44px+ tall). */
+  padding: 0.45rem 0.3rem;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  transition: transform 0.08s ease;
+}
+
+.pixel-button img {
+  display: block;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+.pixel-button:active:not(:disabled) {
+  transform: translateY(2px) scale(0.98);
+}
+
+.pixel-button:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 3px;
+}
+
+/* ---------- First screen: the Open button ---------- */
+.open-cta {
   position: absolute;
   left: 50%;
   bottom: calc(env(safe-area-inset-bottom) + clamp(1rem, 4dvh, 2.5rem));
+  width: clamp(11rem, 58vw, 15rem);
   transform: translateX(-50%);
-  min-width: 12rem;
-  min-height: 3.25rem;
-  padding: 0.75rem 1.5rem;
-  border: 0;
-  border-radius: 999px;
-  background: transparent;
-  color: inherit;
-  font: inherit;
-  font-size: clamp(1.1rem, 4.5vw, 1.4rem);
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  white-space: nowrap;
-  cursor: pointer;
   transition: opacity 0.25s ease;
 }
 
-.hint:focus-visible {
-  outline: 3px solid var(--ink);
-  outline-offset: 2px;
-}
-
-/* Once tapped, the hint fades away and stops taking taps. */
-.hint:disabled {
+/* Once tapped, the button fades away and stops taking taps. */
+.open-cta:disabled {
   opacity: 0;
   pointer-events: none;
 }
 
 @media (prefers-reduced-motion: no-preference) {
-  .hint:not(:disabled) {
-    animation: hint-pulse 2.4s ease-in-out infinite;
+  .open-cta:not(:disabled) {
+    animation: cta-pulse 2.4s ease-in-out infinite;
   }
 }
 
-@keyframes hint-pulse {
-  0%, 100% { opacity: 0.55; transform: translateX(-50%) translateY(0); }
-  50% { opacity: 1; transform: translateX(-50%) translateY(-3px); }
+@keyframes cta-pulse {
+  0%, 100% { transform: translateX(-50%) translateY(0); }
+  50% { transform: translateX(-50%) translateY(-4px); }
+}
+
+/* ---------- Result screen ---------- */
+.result {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: calc(env(safe-area-inset-bottom) + clamp(1rem, 3dvh, 2rem));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.9rem;
+  padding-inline: 1rem;
+  text-align: center;
+}
+
+.sticker-name {
+  margin: 0;
+  font-size: clamp(1.8rem, 8.5vw, 2.4rem);
+  font-weight: 700;
+  line-height: 1.05;
+}
+
+.sticker-rarity {
+  margin: 0.25rem 0 0;
+  font-size: clamp(1rem, 4.2vw, 1.2rem);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0;
+  width: 100%;
+}
+
+.actions-row {
+  display: flex;
+  justify-content: center;
+  gap: 0.2rem;
+  width: 100%;
+}
+
+.actions-row .pixel-button {
+  width: min(46%, 11.6rem);
+}
+
+.action-wide {
+  width: min(64%, 14.6rem);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .result > * {
+    animation: rise-in 0.5s ease-out both;
+  }
+  .result > :nth-child(2) {
+    animation-delay: 0.12s;
+  }
+}
+
+@keyframes rise-in {
+  from { opacity: 0; transform: translateY(14px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
 /* Shown if the 3D view can't start (e.g. WebGL unavailable). */
@@ -105,12 +223,13 @@ body,
 
 .fallback h1 {
   margin: 0;
-  font-size: 1.5rem;
+  font-size: 1.75rem;
 }
 
 .fallback p {
   margin: 0;
   max-width: 24rem;
+  font-size: 1.1rem;
   line-height: 1.4;
 }
 
