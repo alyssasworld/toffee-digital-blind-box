@@ -120,11 +120,12 @@ body,
 /* ---------- First screen: the Open button ---------- */
 .open-cta {
   position: absolute;
-  left: 50%;
+  left: 0;
+  right: 0;
+  margin-inline: auto; /* centres it without a transform, so the press effect can't knock it sideways */
   bottom: calc(env(safe-area-inset-bottom) + clamp(1rem, 4dvh, 2.5rem));
   width: clamp(11rem, 58vw, 15rem);
-  transform: translateX(-50%);
-  transition: opacity 0.25s ease;
+  transition: opacity 0.25s ease, transform 0.08s ease;
 }
 
 /* Once tapped, the button fades away and stops taking taps. */
@@ -139,9 +140,10 @@ body,
   }
 }
 
+/* Uses the separate `translate` property so it never fights the press effect's `transform`. */
 @keyframes cta-pulse {
-  0%, 100% { transform: translateX(-50%) translateY(0); }
-  50% { transform: translateX(-50%) translateY(-4px); }
+  0%, 100% { translate: 0 0; }
+  50% { translate: 0 -4px; }
 }
 
 /* ---------- Result screen ---------- */
@@ -156,6 +158,16 @@ body,
   gap: 0.9rem;
   padding-inline: 1rem;
   text-align: center;
+}
+
+.result {
+  transition: opacity 0.25s ease;
+}
+
+/* "Open another box" was tapped: fade out and stop taking taps. */
+.result--leaving {
+  opacity: 0;
+  pointer-events: none;
 }
 
 .sticker-name {

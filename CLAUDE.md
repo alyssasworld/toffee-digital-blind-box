@@ -721,8 +721,11 @@ Notes:
 
 - [x] Phase 10 — Share: `utils/shareSticker.js` (Web Share API with the ORIGINAL PNG as a File) + `hooks/useStickerActions.js` (Save, Share, notice message; busy guard). The file is prefetched when the sticker starts to emerge (REVEALING) and released on reset, so `navigator.share()` is called synchronously inside the tap when the file is ready (iPhone Safari needs this; do NOT add an `await` or state update before it in `share`/`shareSticker`). Outcomes: shared; cancelled (silent); no file-share support or unexpected error => falls back to Save with a short notice; NotAllowedError => "Tap Share again". Tested with a mocked share API (7 scenarios) in desktop Brave — still needs a real-iPhone test.
 
+- [x] Phase 11 — Open another box: stages REVEALED > RESETTING (0.35s: sticker floats up/shrinks/fades, result text fades; flaps close instantly while the box is off-screen) > RETURNING (0.9s: camera glides back so a fresh closed box rises into view) > IDLE (heading + Open button return, focus moves to the Open button for keyboard users). Input is locked throughout (`openAnother` only acts in REVEALED; repeat taps ignored). Sticker state is cleared (texture + downloaded file released) before the next tap picks a new one. Reduced motion: two quick ~0.12s fades. Dev-only R key hard-resets. Shared `utils/motionPreference.js` replaced 3 copy-pasted helpers; `goTo()` in App.jsx is the single stage-setter.
+- Bug fixed along the way: the Open button was centred with `transform: translateX(-50%)`, and its `:active` press transform replaced that, so with reduced motion the button jumped sideways on press and the tap was lost. It is now centred with auto margins and the pulse uses the `translate` property. Rule: never position elements with `transform` if they also get a press/hover transform.
+
 Current task:
 
-Phase 11 — Reset / open another box (animated close, state fully reset, next opening is a fresh reveal).
+Phase 12 — Loading and error states (branded loading screen, missing GLB/texture/sticker handling, WebGL fallback polish, never a blank or broken page).
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.

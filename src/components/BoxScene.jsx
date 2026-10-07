@@ -5,6 +5,7 @@ import { ContactShadows } from '@react-three/drei'
 import BlindBox from './BlindBox.jsx'
 import StickerReveal from './StickerReveal.jsx'
 import { STAGE } from '../config.js'
+import { prefersReducedMotion } from '../utils/motionPreference.js'
 
 // Camera framing: a 3/4 view looking slightly down at the box. Three framings:
 //   closed:   tight on the closed box
@@ -25,11 +26,10 @@ const CAMERA = {
 
 const FRAMING_INDEX = { closed: 0, open: 1, revealed: 2 }
 const lerp = MathUtils.lerp
-const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 function framingFor(stage) {
   if (stage === STAGE.OPENING || stage === STAGE.REVEALING) return 'open'
-  if (stage === STAGE.REVEALED) return 'revealed'
+  if (stage === STAGE.REVEALED || stage === STAGE.RESETTING) return 'revealed' // RETURNING falls through to 'closed'
   return 'closed'
 }
 

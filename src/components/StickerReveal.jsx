@@ -2,10 +2,11 @@ import { useEffect, useRef, useState } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import { MathUtils, SRGBColorSpace, TextureLoader, Vector3 } from 'three'
 import { STAGE, STICKER_LAYOUT as L, TIMING } from '../config.js'
+import { clamp01, smoothstep } from '../utils/easing.js'
 import { findContentBounds } from '../utils/imageBounds.js'
 import { revealTotalDuration, stickerProgress } from '../utils/stickerMotion.js'
+import { prefersReducedMotion } from '../utils/motionPreference.js'
 
-const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 // Reused every frame to avoid creating garbage.
 const BOX_CENTER = new Vector3(0, 0.75, 0)
@@ -25,6 +26,8 @@ export default function StickerReveal({ sticker, stage, onRevealDone }) {
   const [failed, setFailed] = useState(false)
   const startTime = useRef(null)
   const doneSent = useRef(false)
+  const exitStart = useRef(null) // clock time when "Open another box" was tapped
+  const material = useRef()
 
   useEffect(() => {
     setLoaded(null)
@@ -60,10 +63,12 @@ export default function StickerReveal({ sticker, stage, onRevealDone }) {
     const g = group.current
     if (!g) return
 
-    const active = stage === STAGE.REVEALING || stage === STAGE.REVEALED
+    const exiting = stage === STAGE.RESETTING
+    const active = stage === STAGE.REVEALING || stage === STAGE.REVEALED || exiting
     g.visible = active && !!loaded
     if (!active) {
       startTime.current = null
+      exitStart.current = null
       doneSent.current = false
       return
     }
@@ -110,10 +115,23 @@ export default function StickerReveal({ sticker, stage, onRevealDone }) {
     START.lerp(OUT, rise).lerp(FINAL, present)
     const width = MathUtils.lerp(startWidth, finalWidth, present)
 
+    // Leaving: float up, shrink and fade (with reduced motion: just fade).
+    let leave = 0
+    if (exiting) {
+      if (exitStart.current === null) exitStart.current = clock.elapsedTime
+      const exitSeconds = reduced ? TIMING.resetReducedMotion : TIMING.resetStickerExit
+      leave = smoothstep(clamp01((clock.elapsedTime - exitStart.current) / exitSeconds))
+    } else {
+      exitStart.current = null
+    }
+    if (material.current) material.current.opacity = 1 - leave
+    if (leave > 0 && !reduced) START.addScaledVector(UP, TIMING.stickerExitRise * visibleHeight * leave)
+    const shown = reduced ? width : width * MathUtils.lerp(1, TIMING.stickerExitScale, leave)
+
     g.position.copy(START)
     g.quaternion.copy(camera.quaternion) // always faces the viewer
     g.rotateZ(roll)
-    g.scale.set(width, width / aspect, 1)
+    g.scale.set(shown, shown / aspect, 1)
 
     if (stage === STAGE.REVEALING && t >= revealTotalDuration(reduced) && !doneSent.current) {
       doneSent.current = true
@@ -127,7 +145,7 @@ export default function StickerReveal({ sticker, stage, onRevealDone }) {
         // Shifted so the centre of the visible artwork sits at the group's origin.
         <mesh frustumCulled={false} position={[0.5 - loaded.bounds.cx, loaded.bounds.cy - 0.5, 0]}>
           <planeGeometry args={[1, 1]} />
-          <meshBasicMaterial map={loaded.texture} transparent alphaTest={0.02} toneMapped={false} />
+          <meshBasicMaterial ref={material} map={loaded.texture} transparent alphaTest={0.02} toneMapped={false} />
         </mesh>
       )}
     </group>

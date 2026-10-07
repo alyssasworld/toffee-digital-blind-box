@@ -10,6 +10,7 @@ import {
   shakePose,
   shakeTotalDuration,
 } from '../utils/boxMotion.js'
+import { prefersReducedMotion } from '../utils/motionPreference.js'
 
 export const BOX_MODEL_URL = '/models/toffee_box.glb'
 
@@ -17,7 +18,6 @@ export const BOX_MODEL_URL = '/models/toffee_box.glb'
 // so later phases can open a flap by rotating its node.
 export const FLAP_NAMES = ['Flap_Front', 'Flap_Left', 'Flap_Right', 'Flap_Back']
 
-const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
 // Squish scales from the box base; tilt/twist rotate around the base; slide moves sideways.
 function applyPose(root, { squish, tilt, twist, slide }) {
@@ -64,7 +64,8 @@ export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onRead
   useFrame(({ clock }) => {
     const reduced = prefersReducedMotion()
 
-    if (stage === STAGE.IDLE) {
+    // While the reset runs the box is off-screen, so it can quietly close up before returning.
+    if (stage === STAGE.IDLE || stage === STAGE.RESETTING || stage === STAGE.RETURNING) {
       startTime.current = null
       openStart.current = null
       shakeDoneSent.current = false

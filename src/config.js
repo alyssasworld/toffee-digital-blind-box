@@ -4,7 +4,9 @@ export const STAGE = {
   SHAKING: 'shaking', // tap received: anticipation, shake, settle, pause (input locked)
   OPENING: 'opening', // shake finished: the flaps swing open, then a short reveal pause
   REVEALING: 'revealing', // box is open: the sticker rises out and settles in front of it
-  REVEALED: 'revealed', // sticker is in place; Phase 8 shows the name and buttons from here
+  REVEALED: 'revealed', // sticker is in place, result text and buttons are showing
+  RESETTING: 'resetting', // "Open another box" tapped: the sticker floats away, the result fades out
+  RETURNING: 'returning', // a fresh closed box rises back into view (input still locked)
 }
 
 // Central place for animation timing and feel. Times are in seconds.
@@ -48,6 +50,13 @@ export const TIMING = {
   stickerSwayTilt: 0.1, // gentle sideways rocking while it rises, in radians (~6 degrees)
   stickerSettlePause: 0.5, // a beat after it arrives, before the result screen
   stickerFloat: 0.008, // the tiny idle bob once settled, as a fraction of screen height (0 = still)
+
+  // 8. Open another box: the sticker leaves, then a fresh closed box returns.
+  resetStickerExit: 0.35, // the sticker floats up, shrinks and fades; the result text fades
+  stickerExitRise: 0.1, // how far it floats up while leaving, as a fraction of screen height
+  stickerExitScale: 0.75, // how small it shrinks to
+  resetBoxReturn: 0.9, // the new box rising into view (the camera glide)
+  resetReducedMotion: 0.12, // with reduced motion each of the two steps is just a quick fade
 }
 
 // Where the sticker starts and ends up. Sizes describe the sticker's visible artwork (its
