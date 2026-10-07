@@ -691,8 +691,11 @@ Known to-dos:
 - Asset optimisation (stickers, GLB texture) is deliberately deferred to Phase 13 — do not shrink assets before then.
 - Sticker PNGs are 3000x3000 / ~2.5 MB each; make ~1024px WebP copies for on-screen reveal, keep originals for Save/Share.
 
+- [x] Phase 3 — tap interaction: tap the box or the "Tap to open" button (keyboard-accessible) -> stage IDLE->OPENING, locked against double-taps (ref guard in App.jsx), brief press-squish on the box, hint fades. Stages live in `src/config.js`; timing in `TIMING`.
+- [x] ErrorBoundary: a browser without WebGL shows a friendly message instead of a blank page (Phase 12 will refine).
+
 Current task:
 
-Phase 3 — tap interaction.
+Phase 4 — box shake animation.
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.
