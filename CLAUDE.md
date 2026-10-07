@@ -728,8 +728,19 @@ Notes:
 
 Open questions for the user: (1) sound — `sounds/*.MP3` are still 4 identical placeholder files, and sound is not in the 14-phase plan yet; (2) optional "avoid the same sticker twice in a row" rule (only 2 stickers, so repeats are frequent and feel like a bug); (3) footer/About text, background image, `open_another_button.png`.
 
+- [x] Phase 13 — Performance. Measured with a throttled, fresh-cache run of the production build behind a gzip server (Phase 12 vs now): 3G (1.6 Mbps): tap -> sticker on screen 24.6s -> 6.0s, data 3.0MB -> 0.66MB; 4G: 5.4MB -> 3.1MB; box tappable ~3.5s on 3G / ~0.9s on 4G (JS is ~330KB gz of the ~525KB first load).
+  - Sticker on-screen copies: `scripts/make-sticker-previews.mjs` (sharp, devDependency; `npm run stickers`, also runs as `prebuild`) writes 1280px q88 WebP copies to `public/stickers/preview/` (~120-135KB vs 2.5MB; GPU ~8MB vs ~46MB). Same shape/margins (only scaled). `StickerReveal` loads the preview and falls back to the original PNG if it is missing. Verified vs the originals as rendered by the browser: mean difference 0.4/255, no colour shift. Save/Share still use the untouched original PNG.
+  - IMPORTANT: the sticker PNGs are Display P3 (iCCP + cICP chunks). Do NOT run Save/Share files through a colour-managing tool: sharp/libvips silently converts the pixels (a "lossless" sharp recompress was NOT pixel-identical). A pixel-exact recompress (pngjs) only saves ~17-25%, so the originals are shipped as supplied.
+  - Removed `@react-three/drei` (huge dependency tree; used only for useGLTF + ContactShadows): model now loads with `useLoader(GLTFLoader)`, and `components/GroundShadow.jsx` draws the soft floor shadow from a tiny canvas. Bundle ~-8KB gz (the bundle is inherently Three.js + R3F).
+  - `index.html` preloads the GLB and the Open button image so they download in parallel with the JS.
+  - The 2.5MB original is prefetched (so iPhone Share can open instantly) except on Data Saver / <=3G connections (Chrome/Android only; Safari does not expose this).
+  - Left as is on purpose: GLB texture (2048px JPEG, 174KB; downscaling would blur the box art), continuous render loop (nothing animates at idle but the scene is cheap), DPR already capped at 2.
+  - Hosting note: static files should be served with long-lived caching (hashed `/assets/*` can be immutable; `/stickers`, `/models`, `/buttons` are not hashed) and gzip/brotli for JS/CSS.
+
+Open questions for the user: Save/Share file weight (see below), sound, avoid-repeat rule, footer/About text, background image, `open_another_button.png`.
+
 Current task:
 
-Phase 13 — Performance optimisation (user asked to leave asset optimisation until now: sticker PNGs ~2.5MB each / 3000px, GLB texture 2048px JPEG, bundle ~330KB gz).
+Phase 14 — Production audit (full pass: accessibility, mobile Safari behaviour, hosting/deploy, security headers, final checklist against this document).
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.

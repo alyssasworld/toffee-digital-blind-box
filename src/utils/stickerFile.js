@@ -60,8 +60,17 @@ export function getStickerFile(sticker) {
 
 export const getReadyStickerFile = (sticker) => readyFiles.get(sticker.file) ?? null
 
+// The full-size original is ~2.5 MB. Downloading it in the background (so Share can open instantly)
+// is not worth it on a weak or metered connection. Chrome/Android report this; Safari does not,
+// so there it always prefetches. When skipped, Share just waits for the file when tapped.
+function connectionIsWeak() {
+  const connection = navigator.connection
+  return Boolean(connection?.saveData) || ['slow-2g', '2g', '3g'].includes(connection?.effectiveType)
+}
+
 // Start fetching in the background; errors are handled later when the user actually taps.
 export function prefetchSticker(sticker) {
+  if (connectionIsWeak()) return
   getStickerFile(sticker).catch(() => {})
 }
 

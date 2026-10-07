@@ -3,6 +3,7 @@ import { useFrame, useThree } from '@react-three/fiber'
 import { MathUtils, SRGBColorSpace, TextureLoader, Vector3 } from 'three'
 import { STAGE, STICKER_LAYOUT as L, TIMING } from '../config.js'
 import { clamp01, smoothstep } from '../utils/easing.js'
+import { previewFile } from '../data/stickers.js'
 import { findContentBounds } from '../utils/imageBounds.js'
 import { revealTotalDuration, stickerProgress } from '../utils/stickerMotion.js'
 import { prefersReducedMotion } from '../utils/motionPreference.js'
@@ -35,23 +36,31 @@ export default function StickerReveal({ sticker, stage, onRevealDone, onLoadFail
 
     let cancelled = false
     let texture = null
-    new TextureLoader().load(
-      sticker.file,
-      (tex) => {
-        if (cancelled) return tex.dispose()
-        tex.colorSpace = SRGBColorSpace
-        tex.anisotropy = Math.min(4, gl.capabilities.getMaxAnisotropy())
-        gl.initTexture(tex) // upload to the GPU now, so there is no stutter mid-animation
-        texture = tex
-        setLoaded({ texture: tex, bounds: findContentBounds(tex.image) })
-      },
-      undefined,
-      () => {
-        if (cancelled) return
-        console.warn(`Could not load sticker image ${sticker.file}`)
-        onLoadFailed?.(sticker) // App picks a different sticker instead
-      },
-    )
+
+    // Try the small preview first; if it is missing, fall back to the full-size original.
+    const urls = [previewFile(sticker), sticker.file]
+    const tryLoad = (index) => {
+      new TextureLoader().load(
+        urls[index],
+        (tex) => {
+          if (cancelled) return tex.dispose()
+          tex.colorSpace = SRGBColorSpace
+          tex.anisotropy = Math.min(4, gl.capabilities.getMaxAnisotropy())
+          gl.initTexture(tex) // upload to the GPU now, so there is no stutter mid-animation
+          texture = tex
+          setLoaded({ texture: tex, bounds: findContentBounds(tex.image) })
+        },
+        undefined,
+        () => {
+          if (cancelled) return
+          if (index + 1 < urls.length) return tryLoad(index + 1)
+          console.warn(`Could not load sticker image ${sticker.file}`)
+          onLoadFailed?.(sticker) // App picks a different sticker instead
+        },
+      )
+    }
+    tryLoad(0)
+
     return () => {
       cancelled = true
       texture?.dispose() // free the GPU memory when the sticker is cleared

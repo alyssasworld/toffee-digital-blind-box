@@ -6,6 +6,10 @@
     <meta name="theme-color" content="#fbf4dc" />
     <title>Toffee Blind Box</title>
     <link rel="preload" href="/fonts/pixelify-sans-latin.woff2" as="font" type="font/woff2" crossorigin />
+    <!-- Start downloading the 3D model and the first button right away, in parallel with the JavaScript,
+         instead of waiting for the JavaScript to run and ask for them. -->
+    <link rel="preload" href="/models/toffee_box.glb" as="fetch" crossorigin />
+    <link rel="preload" href="/buttons/open_button.png" as="image" />
     <style>
       /* Critical styles: this loading screen is shown the moment the page arrives, before any
          JavaScript runs, and React reuses the same .boot markup while the 3D box loads. */

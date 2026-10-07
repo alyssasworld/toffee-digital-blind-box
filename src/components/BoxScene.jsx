@@ -1,8 +1,8 @@
 import { Suspense, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import { MathUtils, NoToneMapping } from 'three'
-import { ContactShadows } from '@react-three/drei'
 import BlindBox from './BlindBox.jsx'
+import GroundShadow from './GroundShadow.jsx'
 import StickerReveal from './StickerReveal.jsx'
 import { STAGE } from '../config.js'
 import { prefersReducedMotion } from '../utils/motionPreference.js'
@@ -127,8 +127,7 @@ export default function BoxScene({
         onLoadFailed={onStickerFailed}
         onWaiting={onStickerWaiting}
       />
-
-      <ContactShadows position={[0, 0, 0]} opacity={0.35} scale={4} blur={2.4} far={1.5} resolution={256} frames={1} />
+      <GroundShadow />
     </Canvas>
   )
 }

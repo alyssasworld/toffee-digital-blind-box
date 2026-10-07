@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef } from 'react'
-import { useFrame } from '@react-three/fiber'
-import { useGLTF } from '@react-three/drei'
+import { useFrame, useLoader } from '@react-three/fiber'
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js'
 import { STAGE } from '../config.js'
 import {
   FLAPS_CLOSED,
@@ -36,7 +36,15 @@ function applyFlaps(flaps, angles) {
 }
 
 export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onReady, ...props }) {
-  const { scene, nodes } = useGLTF(BOX_MODEL_URL)
+  const { scene } = useLoader(GLTFLoader, BOX_MODEL_URL)
+  // Every named part of the model (Box_Root, Box_Body, Flap_Front...), for the animations.
+  const nodes = useMemo(() => {
+    const byName = {}
+    scene.traverse((object) => {
+      if (object.name) byName[object.name] = object
+    })
+    return byName
+  }, [scene])
   const startTime = useRef(null) // clock time when the tap happened
   const openStart = useRef(null) // clock time when the flaps began to open
   const shakeDoneSent = useRef(false)
@@ -115,4 +123,4 @@ export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onRead
   )
 }
 
-useGLTF.preload(BOX_MODEL_URL)
+useLoader.preload(GLTFLoader, BOX_MODEL_URL)
