@@ -719,8 +719,10 @@ Notes:
 - [x] Sticker PNGs renamed to `toffee-<name>-sticker.png` (hyphens) in `public/stickers/`; `src/data/stickers.js` updated.
 - [x] Phase 9 — Save: `utils/saveSticker.js` fetches the ORIGINAL PNG (via `getStickerBlob` in `utils/stickerFile.js`, which rejects 404s and HTML-pretending-to-be-PNG, and remembers the blob) and downloads it as `toffee-<name>-sticker.png` (`stickerFileName`, derived from the sticker name). Verified byte-identical to the asset; repeat taps ignored while saving; failure shows a short message. On iPhone Safari this saves to Files/Downloads (not Photos) — Photos comes via the share sheet in Phase 10.
 
+- [x] Phase 10 — Share: `utils/shareSticker.js` (Web Share API with the ORIGINAL PNG as a File) + `hooks/useStickerActions.js` (Save, Share, notice message; busy guard). The file is prefetched when the sticker starts to emerge (REVEALING) and released on reset, so `navigator.share()` is called synchronously inside the tap when the file is ready (iPhone Safari needs this; do NOT add an `await` or state update before it in `share`/`shareSticker`). Outcomes: shared; cancelled (silent); no file-share support or unexpected error => falls back to Save with a short notice; NotAllowedError => "Tap Share again". Tested with a mocked share API (7 scenarios) in desktop Brave — still needs a real-iPhone test.
+
 Current task:
 
-Phase 10 — native Share (Web Share API with the PNG file; call `getStickerBlob` early so the file is ready inside the tap; fall back gracefully to Save).
+Phase 11 — Reset / open another box (animated close, state fully reset, next opening is a fresh reveal).
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.

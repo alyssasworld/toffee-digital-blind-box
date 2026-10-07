@@ -6,14 +6,12 @@ import RevealResult from './components/RevealResult.jsx'
 import { BUTTON_IMAGES, preloadActionImages } from './components/ActionButtons.jsx'
 import { STAGE } from './config.js'
 import { pickRandomSticker } from './utils/randomSticker.js'
-import { saveSticker } from './utils/saveSticker.js'
+import { useStickerActions } from './hooks/useStickerActions.js'
 
 export default function App() {
   const [ready, setReady] = useState(false)
   const [stage, setStage] = useState(STAGE.IDLE)
   const [sticker, setSticker] = useState(null) // chosen when the box is tapped; fixed until the next reveal
-  const [saveFailed, setSaveFailed] = useState(false)
-  const savingRef = useRef(false) // ignores repeat taps while a save is in progress
   const stageRef = useRef(STAGE.IDLE) // updated instantly, so a fast double-tap can't start twice
 
   const startOpening = useCallback(() => {
@@ -47,26 +45,11 @@ export default function App() {
     // Phase 8: the name, rarity and buttons appear from here.
   }, [sticker])
 
-  const handleSave = useCallback(async () => {
-    if (!sticker || savingRef.current) return
-    savingRef.current = true
-    setSaveFailed(false)
-    try {
-      await saveSticker(sticker)
-    } catch (error) {
-      console.warn('Could not save the sticker:', error)
-      setSaveFailed(true)
-    } finally {
-      savingRef.current = false
-    }
-  }, [sticker])
-
   // Back to a closed box with no sticker. Phase 11 will polish this ("Open another box").
   const resetBox = useCallback(() => {
     stageRef.current = STAGE.IDLE
     setStage(STAGE.IDLE)
     setSticker(null)
-    setSaveFailed(false)
   }, [])
 
   // Dev-only shortcut for testing: press R to reset.
@@ -85,6 +68,8 @@ export default function App() {
   }, [ready])
 
   const locked = stage !== STAGE.IDLE
+  // Starts fetching the sticker file for Save/Share once the sticker is on its way out of the box.
+  const { save, share, notice } = useStickerActions(sticker, stage === STAGE.REVEALING || stage === STAGE.REVEALED)
 
   return (
     <ErrorBoundary>
@@ -111,8 +96,7 @@ export default function App() {
           />
         )}
         {stage === STAGE.REVEALED && (
-          // Share gets wired up in the next phase.
-          <RevealResult sticker={sticker} saveFailed={saveFailed} onSave={handleSave} onOpenAnother={resetBox} />
+          <RevealResult sticker={sticker} notice={notice} onSave={save} onShare={share} onOpenAnother={resetBox} />
         )}
       </main>
     </ErrorBoundary>

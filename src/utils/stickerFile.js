@@ -35,3 +35,39 @@ export function getStickerBlob(sticker) {
   }
   return blobs.get(sticker.file)
 }
+
+// The same image as a File (what the share sheet needs). `readyFiles` holds the ones that have
+// finished loading, so a tap handler can grab one WITHOUT waiting (see shareSticker).
+const filePromises = new Map()
+const readyFiles = new Map()
+
+export function getStickerFile(sticker) {
+  if (!filePromises.has(sticker.file)) {
+    const promise = getStickerBlob(sticker)
+      .then((blob) => {
+        const file = new File([blob], stickerFileName(sticker), { type: blob.type })
+        readyFiles.set(sticker.file, file)
+        return file
+      })
+      .catch((error) => {
+        filePromises.delete(sticker.file)
+        throw error
+      })
+    filePromises.set(sticker.file, promise)
+  }
+  return filePromises.get(sticker.file)
+}
+
+export const getReadyStickerFile = (sticker) => readyFiles.get(sticker.file) ?? null
+
+// Start fetching in the background; errors are handled later when the user actually taps.
+export function prefetchSticker(sticker) {
+  getStickerFile(sticker).catch(() => {})
+}
+
+// Forget a sticker's downloaded copy (a few MB) once the reveal is over.
+export function releaseSticker(sticker) {
+  blobs.delete(sticker.file)
+  filePromises.delete(sticker.file)
+  readyFiles.delete(sticker.file)
+}
