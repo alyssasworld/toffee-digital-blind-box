@@ -41,7 +41,7 @@ function ResponsiveCamera() {
   return null
 }
 
-export default function BoxScene({ stage, onTap, onReady }) {
+export default function BoxScene({ stage, onTap, onShakeDone, onReady }) {
   return (
     <Canvas
       className="scene"
@@ -56,7 +56,7 @@ export default function BoxScene({ stage, onTap, onReady }) {
       <directionalLight position={[-4, 2, -2]} intensity={0.6} />
 
       <Suspense fallback={null}>
-        <BlindBox stage={stage} onTap={onTap} onReady={onReady} />
+        <BlindBox stage={stage} onTap={onTap} onShakeDone={onShakeDone} onReady={onReady} />
       </Suspense>
 
       <ContactShadows position={[0, 0, 0]} opacity={0.35} scale={4} blur={2.4} far={1.5} resolution={256} frames={1} />

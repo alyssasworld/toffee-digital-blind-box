@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { useGLTF } from '@react-three/drei'
-import { STAGE, TIMING } from '../config.js'
+import { STAGE } from '../config.js'
+import { REST_POSE, shakePose, shakeTotalDuration } from '../utils/boxMotion.js'
 
 export const BOX_MODEL_URL = '/models/toffee_box.glb'
 
@@ -11,9 +12,17 @@ export const FLAP_NAMES = ['Flap_Front', 'Flap_Left', 'Flap_Right', 'Flap_Back']
 
 const prefersReducedMotion = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
 
-export default function BlindBox({ stage, onTap, onReady, ...props }) {
+// Squish scales from the box base; tilt/twist rotate around the base; slide moves sideways.
+function applyPose(root, { squish, tilt, twist, slide }) {
+  root.scale.set(1 + squish * 0.5, 1 - squish, 1 + squish * 0.5)
+  root.rotation.set(0, twist, tilt)
+  root.position.x = slide
+}
+
+export default function BlindBox({ stage, onTap, onShakeDone, onReady, ...props }) {
   const { scene, nodes } = useGLTF(BOX_MODEL_URL)
-  const pressStart = useRef(null) // clock time when the tap squish began
+  const startTime = useRef(null) // clock time when the tap happened
+  const doneSent = useRef(false)
 
   // References to the movable parts, for the shake/open animations.
   const parts = useMemo(
@@ -33,22 +42,27 @@ export default function BlindBox({ stage, onTap, onReady, ...props }) {
     onReady?.()
   }, [parts, onReady])
 
-  // Tap squish: a quick press-down and bounce back, from the base of the box.
+  // Drive the box from the shake timeline. Everything is a function of time since the tap.
   useFrame(({ clock }) => {
-    if (stage === STAGE.OPENING && pressStart.current === null) {
-      pressStart.current = clock.elapsedTime
+    if (stage === STAGE.IDLE) {
+      startTime.current = null
+      doneSent.current = false
+      applyPose(parts.root, REST_POSE)
+      return
     }
-    if (pressStart.current === null) return
+    if (stage !== STAGE.SHAKING) return
 
-    const t = (clock.elapsedTime - pressStart.current) / TIMING.pressDuration
-    const squish = t < 1 && !prefersReducedMotion() ? Math.sin(Math.PI * t) * TIMING.pressSquish : 0
-    parts.root.scale.set(1 + squish * 0.5, 1 - squish, 1 + squish * 0.5)
+    if (startTime.current === null) startTime.current = clock.elapsedTime
+    const reduced = prefersReducedMotion()
+    const t = clock.elapsedTime - startTime.current
+
+    applyPose(parts.root, shakePose(t, reduced))
+
+    if (t >= shakeTotalDuration(reduced) && !doneSent.current) {
+      doneSent.current = true
+      onShakeDone?.()
+    }
   })
-
-  // Reset the squish bookkeeping when the box returns to idle (Phase 11).
-  useEffect(() => {
-    if (stage === STAGE.IDLE) pressStart.current = null
-  }, [stage])
 
   const idle = stage === STAGE.IDLE
 

@@ -1,4 +1,4 @@
-import { useCallback, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import BoxScene from './components/BoxScene.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import { STAGE } from './config.js'
@@ -10,10 +10,30 @@ export default function App() {
 
   const startOpening = useCallback(() => {
     if (stageRef.current !== STAGE.IDLE) return // locked: ignore extra taps
-    stageRef.current = STAGE.OPENING
-    setStage(STAGE.OPENING)
+    stageRef.current = STAGE.SHAKING
+    setStage(STAGE.SHAKING)
     if (import.meta.env.DEV) console.debug('[blind box] opening started')
     // Phase 6 will pick the random sticker here, once per reveal.
+  }, [])
+
+  const finishShake = useCallback(() => {
+    stageRef.current = STAGE.SETTLED
+    setStage(STAGE.SETTLED)
+    if (import.meta.env.DEV) console.debug('[blind box] shake finished')
+    // Phase 5: the lid opens from here.
+  }, [])
+
+  // Dev-only shortcut for testing: press R to put the box back to idle.
+  // (Phase 11 adds the real "Open another box" button.)
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    const onKey = (e) => {
+      if (e.key !== 'r' && e.key !== 'R') return
+      stageRef.current = STAGE.IDLE
+      setStage(STAGE.IDLE)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => window.removeEventListener('keydown', onKey)
   }, [])
 
   const locked = stage !== STAGE.IDLE
@@ -21,7 +41,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <main className="app">
-        <BoxScene stage={stage} onTap={startOpening} onReady={() => setReady(true)} />
+        <BoxScene stage={stage} onTap={startOpening} onShakeDone={finishShake} onReady={() => setReady(true)} />
         {!ready && <div className="loading" aria-live="polite">Loading…</div>}
         {ready && (
           <button type="button" className="hint" onClick={startOpening} disabled={locked}>

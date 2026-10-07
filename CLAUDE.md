@@ -694,8 +694,10 @@ Known to-dos:
 - [x] Phase 3 — tap interaction: tap the box or the "Tap to open" button (keyboard-accessible) -> stage IDLE->OPENING, locked against double-taps (ref guard in App.jsx), brief press-squish on the box, hint fades. Stages live in `src/config.js`; timing in `TIMING`.
 - [x] ErrorBoundary: a browser without WebGL shows a friendly message instead of a blank page (Phase 12 will refine).
 
+- [x] Phase 4 — box shake: tap -> anticipation squish (0.28s) -> shake building 40%->100% (1.2s) -> settle (0.35s) -> pause (0.4s) -> stage SETTLED (~2.23s total). Pure time-based pose in `src/utils/boxMotion.js`, all values in `TIMING` (`src/config.js`). Reduced motion skips the shake (~0.68s). Dev-only: press R to reset to idle while testing (Phase 11 adds the real button).
+
 Current task:
 
-Phase 4 — box shake animation.
+Phase 5 — lid (flap) opening, triggered when stage reaches SETTLED.
 
 Do not replace or regenerate the supplied assets unless explicitly instructed.
