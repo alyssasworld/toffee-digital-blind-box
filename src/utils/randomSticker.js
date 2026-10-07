@@ -16,4 +16,9 @@ export function pickWeighted(items, random = Math.random) {
   return candidates[candidates.length - 1] // guards against floating-point rounding at the very end
 }
 
-export const pickRandomSticker = (random = Math.random) => pickWeighted(STICKERS, random)
+// `exclude` is a Set of sticker ids to skip (e.g. ones whose image failed to load).
+export const pickRandomSticker = (random = Math.random, exclude = new Set()) =>
+  pickWeighted(
+    STICKERS.filter((sticker) => !exclude.has(sticker.id)),
+    random,
+  )

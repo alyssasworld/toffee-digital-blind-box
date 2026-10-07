@@ -72,12 +72,42 @@ function ResponsiveCamera({ framing }) {
   return null
 }
 
-export default function BoxScene({ stage, sticker, onTap, onShakeDone, onOpenDone, onRevealDone, onReady }) {
+// If the phone takes the GPU away from the page (e.g. low memory, app switching), the browser
+// can usually give it back. Give it a few seconds, then ask for a reload instead of leaving a blank scene.
+const CONTEXT_RESTORE_SECONDS = 4
+
+export default function BoxScene({
+  stage,
+  sticker,
+  onTap,
+  onShakeDone,
+  onOpenDone,
+  onRevealDone,
+  onStickerFailed,
+  onStickerWaiting,
+  onFatal,
+  onReady,
+}) {
+  const handleCreated = ({ gl }) => {
+    let timer = null
+    const canvas = gl.domElement
+    canvas.addEventListener('webglcontextlost', (event) => {
+      event.preventDefault() // tells the browser we'd like the context back
+      console.warn('WebGL context lost')
+      timer = setTimeout(() => onFatal?.('context'), CONTEXT_RESTORE_SECONDS * 1000)
+    })
+    canvas.addEventListener('webglcontextrestored', () => {
+      console.info('WebGL context restored')
+      clearTimeout(timer)
+    })
+  }
+
   return (
     <Canvas
       className="scene"
       dpr={[1, 2]} // cap pixel ratio at 2 to protect mobile GPUs
       camera={{ fov: CAMERA.fov, near: 0.1, far: 50 }}
+      onCreated={handleCreated}
       gl={{ antialias: true, alpha: true, toneMapping: NoToneMapping }} // no tone mapping keeps the artwork colours true
     >
       <ResponsiveCamera framing={framingFor(stage)} />
@@ -90,7 +120,13 @@ export default function BoxScene({ stage, sticker, onTap, onShakeDone, onOpenDon
         <BlindBox stage={stage} onTap={onTap} onShakeDone={onShakeDone} onOpenDone={onOpenDone} onReady={onReady} />
       </Suspense>
 
-      <StickerReveal sticker={sticker} stage={stage} onRevealDone={onRevealDone} />
+      <StickerReveal
+        sticker={sticker}
+        stage={stage}
+        onRevealDone={onRevealDone}
+        onLoadFailed={onStickerFailed}
+        onWaiting={onStickerWaiting}
+      />
 
       <ContactShadows position={[0, 0, 0]} opacity={0.35} scale={4} blur={2.4} far={1.5} resolution={256} frames={1} />
     </Canvas>

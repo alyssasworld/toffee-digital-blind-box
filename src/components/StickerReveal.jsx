@@ -19,19 +19,18 @@ const UP = new Vector3()
 // The sticker as a flat card in the 3D scene, so the box genuinely hides it while it is inside.
 // It loads its image as soon as a sticker is picked (at tap time), so the picture is ready
 // by the time the box has shaken and opened.
-export default function StickerReveal({ sticker, stage, onRevealDone }) {
+export default function StickerReveal({ sticker, stage, onRevealDone, onLoadFailed, onWaiting }) {
   const gl = useThree((s) => s.gl)
   const group = useRef()
   const [loaded, setLoaded] = useState(null) // { texture, bounds } once the image is ready
-  const [failed, setFailed] = useState(false)
   const startTime = useRef(null)
   const doneSent = useRef(false)
+  const waitingSent = useRef(false)
   const exitStart = useRef(null) // clock time when "Open another box" was tapped
   const material = useRef()
 
   useEffect(() => {
     setLoaded(null)
-    setFailed(false)
     if (!sticker) return
 
     let cancelled = false
@@ -50,14 +49,14 @@ export default function StickerReveal({ sticker, stage, onRevealDone }) {
       () => {
         if (cancelled) return
         console.warn(`Could not load sticker image ${sticker.file}`)
-        setFailed(true)
+        onLoadFailed?.(sticker) // App picks a different sticker instead
       },
     )
     return () => {
       cancelled = true
       texture?.dispose() // free the GPU memory when the sticker is cleared
     }
-  }, [sticker, gl])
+  }, [sticker, gl, onLoadFailed])
 
   useFrame(({ clock, camera, size }) => {
     const g = group.current
@@ -66,21 +65,20 @@ export default function StickerReveal({ sticker, stage, onRevealDone }) {
     const exiting = stage === STAGE.RESETTING
     const active = stage === STAGE.REVEALING || stage === STAGE.REVEALED || exiting
     g.visible = active && !!loaded
+
+    // Tell the app when the box is open but the picture hasn't arrived yet (slow connection).
+    const waiting = stage === STAGE.REVEALING && !loaded
+    if (waiting !== waitingSent.current) {
+      waitingSent.current = waiting
+      onWaiting?.(waiting)
+    }
     if (!active) {
       startTime.current = null
       exitStart.current = null
       doneSent.current = false
       return
     }
-    if (failed) {
-      // Image missing: skip the animation so the experience carries on (Phase 12 adds a proper message).
-      if (!doneSent.current) {
-        doneSent.current = true
-        onRevealDone?.()
-      }
-      return
-    }
-    if (!loaded) return // still downloading: the open box waits
+    if (!loaded) return // still downloading: the open box waits (App shows "Loading your sticker…")
 
     const reduced = prefersReducedMotion()
     if (startTime.current === null) startTime.current = clock.elapsedTime

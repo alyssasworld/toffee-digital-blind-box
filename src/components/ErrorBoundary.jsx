@@ -1,6 +1,7 @@
 import { Component } from 'react'
+import ErrorScreen, { kindOfError } from './ErrorScreen.jsx'
 
-// Catches crashes (most commonly: the browser can't create WebGL) so the
+// Catches crashes (a browser without WebGL, a missing or broken 3D model...) so the
 // user sees a friendly message instead of a blank page.
 export default class ErrorBoundary extends Component {
   state = { error: null }
@@ -16,14 +17,6 @@ export default class ErrorBoundary extends Component {
   render() {
     const { error } = this.state
     if (!error) return this.props.children
-
-    return (
-      <div className="fallback" role="alert">
-        <h1>Oops, the box won’t open</h1>
-        <p>Your browser couldn’t start the 3D view. Try reloading, or opening this page in another browser.</p>
-        {/* Technical detail is only shown while developing. */}
-        {import.meta.env.DEV && <pre>{String(error.message || error)}</pre>}
-      </div>
-    )
+    return <ErrorScreen kind={kindOfError(error)} detail={error.message || error} />
   }
 }
