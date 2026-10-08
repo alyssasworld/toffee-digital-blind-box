@@ -14,6 +14,16 @@ export const STAGE = {
 }
 
 // Central place for animation timing and feel. Times are in seconds.
+// Dragging the closed box to look at it from other sides.
+export const TURN = {
+  radiansPerPixel: 0.011, // how far the box turns per pixel dragged (~1 full turn across a phone screen)
+  spinDecay: 4, // how quickly the spin after letting go slows down (higher = stops sooner)
+  maxSpin: 12, // fastest spin allowed after a flick, in radians per second
+  tapSlop: 8, // a press that moves more than this many pixels is a drag, not a tap
+  returnDuration: 0.45, // on tap, the box swings back to facing front over this long (seconds)
+  returnDurationReduced: 0.2,
+}
+
 export const TIMING = {
   // 1. Anticipation: the box squashes down slightly, like taking a breath.
   anticipationDuration: 0.28,
