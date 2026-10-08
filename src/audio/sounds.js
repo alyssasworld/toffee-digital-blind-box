@@ -29,6 +29,14 @@ function getContext() {
   if (context) return context
   const AudioContext = window.AudioContext || window.webkitAudioContext
   if (!AudioContext) return null
+  // On iPhone, Web Audio is "ambient" sound by default, which the silent switch mutes. Declaring
+  // "playback" (like music/video) lets the effects play in Silent Mode; the speaker button still mutes.
+  // Needs iOS 16.4+; elsewhere this API doesn't exist and nothing changes.
+  try {
+    if (navigator.audioSession) navigator.audioSession.type = 'playback'
+  } catch {
+    /* unsupported: sounds just follow the phone's silent switch */
+  }
   context = new AudioContext()
   master = context.createGain()
   master.gain.value = SOUND_MIX.master
