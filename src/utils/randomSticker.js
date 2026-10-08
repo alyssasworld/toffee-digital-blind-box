@@ -1,16 +1,17 @@
 import { STICKERS } from '../data/stickers.js'
 
-// The random source for sticker draws. Grabbed once at load so that overriding
-// `Math.random` later from the browser console can't steer the result; prefers the
-// browser's crypto generator. (Everything runs in the browser, so this stops casual
-// tampering only - a determined user can always edit the page. A truly tamper-proof
-// draw would need a server.)
+// The random source for sticker draws. The generator functions are grabbed once at load (not
+// looked up at draw time), so overriding `Math.random` or `crypto.getRandomValues` later from the
+// browser console can't steer the result. Prefers the browser's crypto generator. (Everything
+// runs in the browser, so this stops casual tampering only - a determined user can always edit
+// the page. A truly tamper-proof draw would need a server.)
 const mathRandom = Math.random
 const cryptoApi = globalThis.crypto
+const getRandomValues = cryptoApi?.getRandomValues ? cryptoApi.getRandomValues.bind(cryptoApi) : null
 export function secureRandom() {
-  if (cryptoApi?.getRandomValues) {
+  if (getRandomValues) {
     const buffer = new Uint32Array(1)
-    cryptoApi.getRandomValues(buffer)
+    getRandomValues(buffer)
     return buffer[0] / 4294967296
   }
   return mathRandom()

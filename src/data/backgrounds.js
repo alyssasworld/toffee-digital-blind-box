@@ -21,6 +21,20 @@ export const BACKGROUNDS = [
     color: '#b8845f',
     position: 'center 35%', // on wide screens keep the glowing lamp area in view
   },
+  {
+    id: 'galaxy',
+    name: 'Galaxy',
+    file: '/background/galaxy_pixel.png',
+    color: '#264b61',
+    position: 'center', // the bright core is in the middle, so a centred crop keeps it on phones too
+  },
+  {
+    id: 'meadow',
+    name: 'Meadow',
+    file: '/background/green_meadow_pixel.png',
+    color: '#749506',
+    position: 'center',
+  },
 ]
 
 export const DEFAULT_BACKGROUND_ID = 'sky'
