@@ -1,6 +1,8 @@
 // The text and link shown from the footer. Edit freely.
 export const GITHUB_URL = 'https://github.com/alyssasworld/toffee-digital-blind-box'
 
+export const CONTACT_EMAIL = 'hello@loveactionalyssa.com'
+
 export const ABOUT_TITLE = 'About'
 
 // One entry per paragraph.
