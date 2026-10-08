@@ -8,7 +8,8 @@
     "build": "vite build",
     "preview": "vite preview",
     "stickers": "node scripts/make-sticker-previews.mjs",
-    "prebuild": "node scripts/make-sticker-previews.mjs"
+    "gallery": "node scripts/make-gallery-web.mjs",
+    "prebuild": "node scripts/make-sticker-previews.mjs && node scripts/make-gallery-web.mjs"
   },
   "dependencies": {
     "@react-three/fiber": "^9.8.1",

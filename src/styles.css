@@ -443,13 +443,147 @@ body,
   line-height: 1.4;
 }
 
-.about .about-links {
-  margin-bottom: 1.1rem;
-}
-
 .about a {
   color: inherit;
   text-underline-offset: 0.25em;
+}
+
+/* ---------- Gallery (inside the About panel) ---------- */
+.gallery {
+  margin: 0.25rem 0 1rem;
+}
+
+/* The frame is 3:4 but never taller than ~55% of the screen, so it fits short phones and landscape too. */
+.gallery-frame {
+  position: relative;
+  width: min(100%, max(calc(55dvh * 0.75), 15rem));
+  margin-inline: auto;
+  aspect-ratio: 3 / 4;
+  border: 3px solid var(--ink);
+  background: var(--ink);
+  box-shadow: 4px 4px 0 var(--ink);
+}
+
+.gallery-track {
+  display: flex;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  overscroll-behavior-x: contain;
+  scrollbar-width: none;
+  touch-action: pan-x pan-y;
+}
+
+.gallery-track::-webkit-scrollbar {
+  display: none;
+}
+
+.gallery-track:focus-visible {
+  outline: 3px solid var(--bg);
+  outline-offset: 2px;
+}
+
+.gallery-slide {
+  position: relative;
+  flex: 0 0 100%;
+  height: 100%;
+  scroll-snap-align: center;
+  scroll-snap-stop: always;
+}
+
+.gallery-slide img,
+.gallery-slide video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.gallery-play {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 4.5rem;
+  height: 4.5rem;
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  background: #fff8e0;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.6rem;
+  cursor: pointer;
+}
+
+.gallery-arrow {
+  position: absolute;
+  top: 50%;
+  width: 2.75rem;
+  height: 2.75rem;
+  margin-top: -1.375rem;
+  padding: 0 0 0.2rem;
+  border: 3px solid var(--ink);
+  border-radius: 0;
+  background: rgba(255, 248, 224, 0.92);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.8rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.gallery-prev { left: 0.4rem; }
+.gallery-next { right: 0.4rem; }
+
+.gallery-arrow:disabled {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.gallery-play:active {
+  transform: scale(0.95);
+}
+
+.gallery-play:focus-visible,
+.gallery-arrow:focus-visible,
+.gallery-dot:focus-visible {
+  outline: 3px solid var(--bg);
+  outline-offset: 2px;
+}
+
+/* Dots: a 44px tap area around a small pixel square. */
+.gallery-dots {
+  display: flex;
+  justify-content: center;
+  margin-top: 0.4rem;
+}
+
+.gallery-dot {
+  position: relative;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+}
+
+.gallery-dot::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 0.7rem;
+  height: 0.7rem;
+  border: 2px solid var(--ink);
+  background: transparent;
+}
+
+.gallery-dot[aria-current='true']::after {
+  background: var(--ink);
 }
 
 @keyframes fade-in {
