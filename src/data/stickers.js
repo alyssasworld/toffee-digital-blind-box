@@ -35,6 +35,13 @@ export const STICKERS = [
     rarity: 'common',
     weight: 10,
   },
+  {
+    id: 'judging-mode',
+    name: 'Judging Mode',
+    file: '/stickers/toffee-judging-mode-sticker.png',
+    rarity: 'common',
+    weight: 10,
+  },
 ]
 
 // The small copy shown in the 3D reveal: /stickers/x.png -> /stickers/preview/x.webp
