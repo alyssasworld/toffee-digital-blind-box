@@ -1,7 +1,3 @@
-// Full-screen picture behind everything (set to null for a plain colour). It is drawn with hard
-// pixel edges, so a low-resolution pixel-art image stays crisp at any screen size.
-export const BACKDROP_IMAGE = '/background/sky-pixel-bg.png'
-
 // Stages of one reveal. Later phases add more (opening, revealing, revealed...).
 export const STAGE = {
   IDLE: 'idle', // closed box, waiting for a tap

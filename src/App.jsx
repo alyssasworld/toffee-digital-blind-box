@@ -7,12 +7,14 @@ import RevealResult from './components/RevealResult.jsx'
 import Footer from './components/Footer.jsx'
 import AboutSheet from './components/AboutSheet.jsx'
 import SoundToggle from './components/SoundToggle.jsx'
+import BackgroundPicker, { BackgroundButton } from './components/BackgroundPicker.jsx'
 import { BUTTON_IMAGES, preloadActionImages } from './components/ActionButtons.jsx'
-import { BACKDROP_IMAGE, STAGE, TIMING } from './config.js'
+import { STAGE, TIMING } from './config.js'
 import { prefersReducedMotion } from './utils/motionPreference.js'
 import { pickRandomSticker, secureRandom } from './utils/randomSticker.js'
 import { useStickerActions } from './hooks/useStickerActions.js'
 import { useSounds } from './hooks/useSounds.js'
+import { useBackground } from './hooks/useBackground.js'
 
 export default function App() {
   const [ready, setReady] = useState(false)
@@ -23,7 +25,7 @@ export default function App() {
   const [waitingForSticker, setWaitingForSticker] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
   const [turned, setTurned] = useState(false) // has the visitor spun the box yet? (hides the "Rotate me!" hint for good)
-  const [backdropReady, setBackdropReady] = useState(false)
+  const [pickerOpen, setPickerOpen] = useState(false)
   const stickerRef = useRef(null) // the current sticker, readable from callbacks without making them change
   const failedStickers = useRef(new Set()) // ids of stickers whose image would not load (this visit)
   const stageRef = useRef(STAGE.IDLE) // updated instantly, so a fast double-tap can't start twice
@@ -127,14 +129,6 @@ export default function App() {
     return () => window.removeEventListener('keydown', onKey)
   }, [hardReset])
 
-  // Fade the background picture in once it has downloaded (until then the page is its average colour).
-  useEffect(() => {
-    if (!BACKDROP_IMAGE) return
-    const image = new Image()
-    image.onload = () => setBackdropReady(true)
-    image.src = BACKDROP_IMAGE
-  }, [])
-
   // Fade the loading screen out once the box is ready, then remove it.
   useEffect(() => {
     if (!ready) return
@@ -149,6 +143,10 @@ export default function App() {
 
   const openAbout = useCallback(() => setAboutOpen(true), [])
   const closeAbout = useCallback(() => setAboutOpen(false), [])
+  const openPicker = useCallback(() => setPickerOpen(true), [])
+  const closePicker = useCallback(() => setPickerOpen(false), [])
+  // Fades the chosen picture in once it has downloaded (until then the page is its average colour).
+  const { background, choose: chooseBackground, ready: backdropReady } = useBackground()
   const handleReady = useCallback(() => setReady(true), []) // stable, so the scene is not re-set up on every render
   const locked = stage !== STAGE.IDLE
   // Starts fetching the sticker file for Save/Share once the sticker is on its way out of the box.
@@ -162,7 +160,7 @@ export default function App() {
       <main className="app">
         <div
           className={`backdrop${backdropReady ? ' backdrop--ready' : ''}`}
-          style={BACKDROP_IMAGE ? { '--backdrop-image': `url(${BACKDROP_IMAGE})` } : undefined}
+          style={{ '--backdrop-image': `url(${background.file})`, '--backdrop-position': background.position }}
         />
         <BoxScene
           stage={stage}
@@ -226,7 +224,16 @@ export default function App() {
           <Footer hidden={aboutOpen || (stage !== STAGE.IDLE && stage !== STAGE.REVEALED)} onAbout={openAbout} />
         )}
         {ready && <SoundToggle muted={muted} onToggle={toggleMuted} />}
+        {ready && (
+          <BackgroundButton
+            onClick={openPicker}
+            hidden={aboutOpen || (stage !== STAGE.IDLE && stage !== STAGE.REVEALED)}
+          />
+        )}
         {aboutOpen && <AboutSheet onClose={closeAbout} />}
+        {pickerOpen && (
+          <BackgroundPicker currentId={background.id} onChoose={chooseBackground} onClose={closePicker} />
+        )}
       </main>
     </ErrorBoundary>
   )

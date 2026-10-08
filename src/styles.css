@@ -49,7 +49,7 @@ body,
 .backdrop {
   position: absolute;
   inset: 0;
-  background: var(--backdrop-image, none) center / cover no-repeat;
+  background: var(--backdrop-image, none) var(--backdrop-position, center) / cover no-repeat;
   image-rendering: pixelated; /* hard block edges instead of a blurry stretch */
   opacity: 0;
   transition: opacity 0.6s ease;
@@ -474,11 +474,11 @@ body,
   white-space: nowrap;
 }
 
-/* ---------- Sound on/off button ---------- */
-.sound-toggle {
+/* ---------- Sound on/off button (top right) and background button (top left) ---------- */
+.sound-toggle,
+.bg-toggle {
   position: absolute;
   top: calc(env(safe-area-inset-top) + 0.5rem);
-  right: calc(env(safe-area-inset-right) + 0.5rem);
   z-index: 3;
   display: grid;
   place-items: center;
@@ -491,17 +491,90 @@ body,
   cursor: pointer;
 }
 
-.sound-toggle svg {
+.sound-toggle {
+  right: calc(env(safe-area-inset-right) + 0.5rem);
+}
+
+.bg-toggle {
+  left: calc(env(safe-area-inset-left) + 0.5rem);
+  transition: opacity 0.25s ease, visibility 0s;
+}
+
+/* Like the footer, it steps aside (and can't be tabbed to) while the box is animating. */
+.bg-toggle--hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transition: opacity 0.25s ease, visibility 0s 0.25s;
+}
+
+.sound-toggle svg,
+.bg-toggle svg {
   width: 1.5rem;
   height: 1.5rem;
   fill: currentColor;
 }
 
-.sound-toggle:active {
+.sound-toggle:active,
+.bg-toggle:active {
   transform: translateY(2px);
 }
 
-.sound-toggle:focus-visible {
+.sound-toggle:focus-visible,
+.bg-toggle:focus-visible {
   outline: 3px solid var(--paper);
   outline-offset: 2px;
+}
+
+/* ---------- Background picker ---------- */
+.bg-backdrop {
+  background: rgba(42, 47, 92, 0.18); /* light, so the picture you pick stays visible behind the panel */
+}
+
+.bg-picker {
+  width: min(100%, 24rem);
+}
+
+.bg-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.bg-option {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  padding: 0.4rem;
+  border: 3px solid transparent;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.05rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.bg-option[aria-pressed='true'] {
+  border-color: var(--ink);
+  background: #fff;
+}
+
+.bg-option:active {
+  transform: translateY(2px);
+}
+
+.bg-option:focus-visible {
+  outline: 3px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.bg-thumb {
+  display: block;
+  aspect-ratio: 3 / 4; /* the pictures are portrait */
+  border: 3px solid var(--ink);
+  background-size: cover;
+  background-position: center;
+  image-rendering: pixelated;
 }
