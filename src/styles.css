@@ -118,6 +118,46 @@ body,
   opacity: 0;
 }
 
+/* "Rotate me!": a small floating nudge under the heading until the visitor turns the box. */
+.turn-hint {
+  position: absolute;
+  top: calc(env(safe-area-inset-top) + clamp(1rem, 4.5dvh, 2.5rem) + clamp(2.4rem, 12vw, 3.6rem) + 0.6rem);
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  font-size: clamp(1rem, 4.6vw, 1.3rem);
+  font-weight: 700;
+  color: var(--paper);
+  text-shadow: 0.08em 0.1em 0 var(--ink);
+  pointer-events: none;
+  transition: opacity 0.3s ease;
+}
+
+.turn-hint span::before {
+  content: '< ';
+}
+
+.turn-hint span::after {
+  content: ' >';
+}
+
+.turn-hint--hidden {
+  opacity: 0;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .turn-hint:not(.turn-hint--hidden) span {
+    display: inline-block;
+    animation: hint-float 2.2s ease-in-out infinite;
+  }
+}
+
+@keyframes hint-float {
+  0%, 100% { translate: -6px 0; }
+  50% { translate: 6px 0; }
+}
+
 /* ---------- Pixel-art buttons (the label is part of the picture) ---------- */
 .pixel-button {
   display: block;

@@ -36,7 +36,7 @@ function applyFlaps(flaps, angles) {
   flaps.Flap_Right.rotation.z = -angles.right
 }
 
-export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onReady, ...props }) {
+export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onReady, onTurn, ...props }) {
   const { scene } = useLoader(GLTFLoader, BOX_MODEL_URL)
   // Every named part of the model (Box_Root, Box_Body, Flap_Front...), for the animations.
   const nodes = useMemo(() => {
@@ -94,6 +94,7 @@ export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onRead
       const dt = Math.max((e.timeStamp - d.time) / 1000, 0.008)
       const turn = dx * TURN.radiansPerPixel
       yaw.current += turn
+      onTurn?.() // lets the "Rotate me!" hint know the visitor found it
       // Smoothed so one jittery event doesn't decide the flick speed.
       spin.current = 0.6 * spin.current + 0.4 * Math.max(-TURN.maxSpin, Math.min(TURN.maxSpin, turn / dt))
       d.x = e.clientX
@@ -116,7 +117,7 @@ export default function BlindBox({ stage, onTap, onShakeDone, onOpenDone, onRead
       window.removeEventListener('pointerup', onUp)
       window.removeEventListener('pointercancel', onUp)
     }
-  }, [gl])
+  }, [gl, onTurn])
 
   // Drive the box from the timelines. Everything is a function of time since the stage began.
   useFrame(({ clock }, delta) => {

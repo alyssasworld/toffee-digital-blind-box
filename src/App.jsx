@@ -22,6 +22,7 @@ export default function App() {
   const [fatal, setFatal] = useState(null) // an unrecoverable problem: 'stickers' | 'context'
   const [waitingForSticker, setWaitingForSticker] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
+  const [turned, setTurned] = useState(false) // has the visitor spun the box yet? (hides the "Rotate me!" hint for good)
   const [backdropReady, setBackdropReady] = useState(false)
   const stickerRef = useRef(null) // the current sticker, readable from callbacks without making them change
   const failedStickers = useRef(new Set()) // ids of stickers whose image would not load (this visit)
@@ -33,6 +34,8 @@ export default function App() {
     stageRef.current = next
     setStage(next)
   }, [])
+
+  const handleTurn = useCallback(() => setTurned(true), [])
 
   const startOpening = useCallback(() => {
     if (stageRef.current !== STAGE.IDLE) return // locked: ignore extra taps
@@ -172,6 +175,7 @@ export default function App() {
           onStickerWaiting={setWaitingForSticker}
           onFatal={setFatal}
           onReady={handleReady}
+          onTurn={handleTurn}
         />
         {bootVisible && (
           <div className={`boot${ready ? ' boot--done' : ''}`} role="status">
@@ -187,6 +191,11 @@ export default function App() {
           </div>
         )}
         {ready && <h1 className={`title${locked ? ' title--hidden' : ''}`}>Open Me!</h1>}
+        {ready && (
+          <p className={`turn-hint${locked || turned ? ' turn-hint--hidden' : ''}`} aria-hidden="true">
+            <span>Rotate me!</span>
+          </p>
+        )}
         {ready && (
           <PixelButton
             src={BUTTON_IMAGES.open}

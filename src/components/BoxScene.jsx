@@ -87,6 +87,7 @@ export default function BoxScene({
   onStickerWaiting,
   onFatal,
   onReady,
+  onTurn,
 }) {
   const handleCreated = ({ gl }) => {
     let timer = null
@@ -117,7 +118,7 @@ export default function BoxScene({
       <directionalLight position={[-4, 2, -2]} intensity={0.6} />
 
       <Suspense fallback={null}>
-        <BlindBox stage={stage} onTap={onTap} onShakeDone={onShakeDone} onOpenDone={onOpenDone} onReady={onReady} />
+        <BlindBox stage={stage} onTap={onTap} onShakeDone={onShakeDone} onOpenDone={onOpenDone} onReady={onReady} onTurn={onTurn} />
       </Suspense>
 
       <StickerReveal
