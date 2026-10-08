@@ -10,7 +10,7 @@ import SoundToggle from './components/SoundToggle.jsx'
 import { BUTTON_IMAGES, preloadActionImages } from './components/ActionButtons.jsx'
 import { BACKDROP_IMAGE, STAGE, TIMING } from './config.js'
 import { prefersReducedMotion } from './utils/motionPreference.js'
-import { pickRandomSticker } from './utils/randomSticker.js'
+import { pickRandomSticker, secureRandom } from './utils/randomSticker.js'
 import { useStickerActions } from './hooks/useStickerActions.js'
 import { useSounds } from './hooks/useSounds.js'
 
@@ -40,7 +40,7 @@ export default function App() {
     if (import.meta.env.DEV) console.debug('[blind box] opening started')
 
     // Pick the sticker now (not on page load). The guard above means this runs once per reveal.
-    const picked = pickRandomSticker(Math.random, failedStickers.current)
+    const picked = pickRandomSticker(secureRandom, failedStickers.current)
     stickerRef.current = picked
     setSticker(picked)
     if (!picked) setFatal('stickers') // every sticker image has failed to load
@@ -54,7 +54,7 @@ export default function App() {
   const handleStickerFailed = useCallback((failed) => {
     if (stickerRef.current?.id !== failed.id) return // an old sticker; ignore
     failedStickers.current.add(failed.id)
-    const next = pickRandomSticker(Math.random, failedStickers.current)
+    const next = pickRandomSticker(secureRandom, failedStickers.current)
     if (import.meta.env.DEV) console.debug('[blind box] sticker image failed:', failed.id, '-> using', next?.id ?? 'none')
     stickerRef.current = next
     setSticker(next)

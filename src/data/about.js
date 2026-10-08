@@ -1,5 +1,5 @@
 // The text and link shown from the footer. Edit freely.
-export const GITHUB_URL = 'https://github.com/alyssapineda/toffee-digital-blind-box'
+export const GITHUB_URL = 'https://github.com/alyssasworld/toffee-digital-blind-box'
 
 export const ABOUT_TITLE = 'About'
 
