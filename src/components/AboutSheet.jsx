@@ -1,5 +1,6 @@
 import { useRef } from 'react'
-import { ABOUT_PARAGRAPHS, ABOUT_TITLE, GITHUB_URL } from '../data/about.js'
+import { ABOUT_PARAGRAPHS, ABOUT_TITLE } from '../data/about.js'
+import Gallery from './Gallery.jsx'
 import { useDialogFocus } from '../hooks/useDialogFocus.js'
 
 // The "About" panel: a dialog over the page. Esc, the Close button or a tap outside closes it,
@@ -23,11 +24,8 @@ export default function AboutSheet({ onClose }) {
         {ABOUT_PARAGRAPHS.map((text) => (
           <p key={text}>{text}</p>
         ))}
-        <p className="about-links">
-          <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
-            GitHub<span className="sr-only"> (opens in a new tab)</span>
-          </a>
-        </p>
+        <p>The model in question:</p>
+        <Gallery />
         <button ref={closeButton} type="button" className="text-button" onClick={onClose}>
           Close
         </button>

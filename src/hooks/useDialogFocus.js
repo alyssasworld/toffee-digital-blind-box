@@ -7,7 +7,7 @@ const FOCUSABLE = 'a[href], button:not([disabled])'
 export function useDialogFocus(panel, initialFocus, onClose) {
   useEffect(() => {
     const opener = document.activeElement
-    initialFocus.current?.focus()
+    initialFocus.current?.focus({ preventScroll: true }) // so a long panel opens at its top
     return () => opener?.focus?.()
   }, [initialFocus])
 

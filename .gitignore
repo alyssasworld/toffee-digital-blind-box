@@ -3,3 +3,15 @@ dist/
 .env
 .DS_Store
 .vercel
+
+# Untouched phone photos/videos (they carry camera metadata). Only the cleaned copies in public/gallery/web are published.
+reference/gallery-originals/
+public/gallery/*.JPG
+public/gallery/*.jpg
+public/gallery/*.JPEG
+public/gallery/*.MOV
+public/gallery/*.mov
+
+# Local env files and logs
+.env.*
+*.log
