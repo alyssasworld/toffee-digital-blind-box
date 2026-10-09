@@ -304,6 +304,20 @@ body,
   line-height: 1.25;
 }
 
+/* "Press and hold to save" picture for in-app browsers. */
+.hold-to-save {
+  text-align: center;
+}
+
+.hold-to-save img {
+  display: block;
+  width: min(100%, 18rem);
+  max-height: 45dvh;
+  margin: 0 auto 0.75rem;
+  object-fit: contain;
+  -webkit-touch-callout: default; /* lets press-and-hold offer "Save to Photos" */
+}
+
 /* Shown if something stops the experience from starting (see ErrorScreen.jsx). */
 .fallback {
   background: var(--paper);

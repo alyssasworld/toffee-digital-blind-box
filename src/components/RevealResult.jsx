@@ -1,4 +1,5 @@
 import { RARITIES } from '../data/stickers.js'
+import { isInAppBrowser } from '../utils/inAppBrowser.js'
 import ActionButtons from './ActionButtons.jsx'
 
 // The result screen under the sticker: its name, its rarity (if it has one) and the buttons.
@@ -14,6 +15,9 @@ export default function RevealResult({ sticker, notice, leaving, onSave, onShare
         {rarity && <p className="sticker-rarity">{rarity}</p>}
       </div>
       <ActionButtons onSave={onSave} onShare={onShare} onOpenAnother={onOpenAnother} />
+      {!leaving && isInAppBrowser() && (
+        <p className="result-notice">Tip: for the smoothest experience, open this page in Safari or Chrome.</p>
+      )}
       {notice && (
         <p className="result-notice" role="alert">
           {notice}

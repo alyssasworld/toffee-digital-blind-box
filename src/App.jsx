@@ -3,6 +3,7 @@ import BoxScene from './components/BoxScene.jsx'
 import PixelButton from './components/PixelButton.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import ErrorScreen from './components/ErrorScreen.jsx'
+import HoldToSave from './components/HoldToSave.jsx'
 import RevealResult from './components/RevealResult.jsx'
 import Footer from './components/Footer.jsx'
 import AboutSheet from './components/AboutSheet.jsx'
@@ -151,7 +152,7 @@ export default function App() {
   const locked = stage !== STAGE.IDLE
   // Starts fetching the sticker file for Save/Share once the sticker is on its way out of the box.
   const { muted, toggleMuted } = useSounds(stage)
-  const { save, share, notice } = useStickerActions(sticker, stage === STAGE.REVEALING || stage === STAGE.REVEALED)
+  const { save, share, notice, holdToSave, closeHoldToSave } = useStickerActions(sticker, stage === STAGE.REVEALING || stage === STAGE.REVEALED)
 
   if (fatal) return <ErrorScreen kind={fatal} />
 
@@ -231,6 +232,7 @@ export default function App() {
           />
         )}
         {aboutOpen && <AboutSheet onClose={closeAbout} />}
+        {holdToSave && sticker && <HoldToSave sticker={sticker} onClose={closeHoldToSave} />}
         {pickerOpen && (
           <BackgroundPicker currentId={background.id} onChoose={chooseBackground} onClose={closePicker} />
         )}

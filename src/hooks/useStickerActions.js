@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { prefetchSticker, releaseSticker } from '../utils/stickerFile.js'
 import { saveSticker } from '../utils/saveSticker.js'
 import { shareSticker } from '../utils/shareSticker.js'
+import { isInAppBrowser } from '../utils/inAppBrowser.js'
 
 const MESSAGES = {
   saveFailed: 'Couldn’t save the sticker. Please try again.',
@@ -16,6 +17,7 @@ const NOTICE_SECONDS = 6
 // file starts downloading in the background, so it is ready by the time Share is tapped.
 export function useStickerActions(sticker, enabled) {
   const [notice, setNotice] = useState(null)
+  const [holdToSave, setHoldToSave] = useState(false) // in-app browsers: show the press-and-hold picture
   const busy = useRef(false) // ignores repeat taps while a save/share is in progress
 
   useEffect(() => {
@@ -30,13 +32,34 @@ export function useStickerActions(sticker, enabled) {
     return () => clearTimeout(timer)
   }, [notice])
 
-  useEffect(() => setNotice(null), [sticker]) // new reveal, clean slate
+  useEffect(() => {
+    setNotice(null)
+    setHoldToSave(false)
+  }, [sticker]) // new reveal, clean slate
+
+  // In-app browsers (LinkedIn etc.) ignore file downloads, so Save opens the share sheet instead
+  // (it has "Save Image"), and if that isn't possible either, the press-and-hold picture.
+  // As in share(): nothing is awaited or set before shareSticker, so it still counts as coming from the tap.
+  const saveInApp = useCallback(async () => {
+    try {
+      const outcome = await shareSticker(sticker)
+      if (outcome === 'unsupported') setHoldToSave(true)
+      else setNotice(null)
+    } catch (error) {
+      if (error?.name === 'NotAllowedError') setNotice(MESSAGES.shareTapAgain)
+      else setHoldToSave(true)
+    }
+  }, [sticker])
 
   const save = useCallback(async () => {
     if (!sticker || busy.current) return
     busy.current = true
-    setNotice(null)
     try {
+      if (isInAppBrowser()) {
+        await saveInApp()
+        return
+      }
+      setNotice(null)
       await saveSticker(sticker)
     } catch (error) {
       console.warn('Could not save the sticker:', error)
@@ -44,7 +67,7 @@ export function useStickerActions(sticker, enabled) {
     } finally {
       busy.current = false
     }
-  }, [sticker])
+  }, [sticker, saveInApp])
 
   // Saving as the fallback when the share sheet isn't an option.
   const saveInstead = useCallback(
@@ -78,5 +101,7 @@ export function useStickerActions(sticker, enabled) {
     }
   }, [sticker, saveInstead])
 
-  return { save, share, notice }
+  const closeHoldToSave = useCallback(() => setHoldToSave(false), [])
+
+  return { save, share, notice, holdToSave, closeHoldToSave }
 }
