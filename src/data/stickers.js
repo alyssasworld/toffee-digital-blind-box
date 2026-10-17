@@ -42,6 +42,13 @@ export const STICKERS = [
     rarity: 'common',
     weight: 10,
   },
+  {
+    id: 'loaf-mode',
+    name: 'Loaf Mode',
+    file: '/stickers/toffee-loaf-mode-sticker.png',
+    rarity: 'common',
+    weight: 10,
+  },
 ]
 
 // The small copy shown in the 3D reveal: /stickers/x.png -> /stickers/preview/x.webp
