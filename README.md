@@ -202,12 +202,6 @@ scripts/               build-time image preparation
 reference/             original schematic (not shipped)
 ```
 
-## Still to do
-
-- Real-iPhone testing of Share and audio
-- Replace the placeholder sound files with final audio
-- First production deploy and NFC/QR links
-
 ---
 
 Made with love (and a shopping problem) by Alyssa, for Toffee.
